@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module mux4 #(
+module Mux4 #(
     parameter WIDTH = 32
 ) (
     input logic [WIDTH-1:0] d00,

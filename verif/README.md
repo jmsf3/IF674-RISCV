@@ -31,19 +31,11 @@ Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado e pod
 
 # 🧪 Como Testar seu Programa com o Testbench
 
-1. Crie um novo projeto vazio no ModelSim.
+1. Abra o arquivo [`IF674-RISCV.mpf`](..\IF674-RISCV.mpf) como um projeto no ModelSim.
 
-2. Na pasta do projeto, inclua os seguintes arquivos:
-    - [compile_verilog](compile_verilog)
-    - [runtb_top](runtb_top)
-    - instruction.mif
-    - data.mif
-
-3. No [compile_verilog](compile_verilog), ajuste o caminho de cada arquivo para o local onde eles estão no seu computador.
-
-4. No terminal do ModelSim, execute o seguinte comando:
+2. No terminal do ModelSim, execute o seguinte comando:
     ```shell
-    do runtb_top
+    do verif/RunTestBench
     ```
 
-O processo de compilação e simulação será iniciado, e os resultados serão exibidos no terminal (transcript) do ModelSim. Além disso, uma janela de waveform será aberta, mostrando os sinais indicados em [`runtb_top.sv`](runtb_top.sv). Você pode usar essa janela para verificar mais detalhadamente o funcionamento do processador.
+O processo de compilação e simulação será iniciado, e os resultados serão exibidos no terminal (transcript) do ModelSim. Além disso, uma janela de waveform será aberta, mostrando os sinais indicados em [`TestBench.sv`](TestBench.sv). Você pode usar essa janela para verificar mais detalhadamente o funcionamento do processador.

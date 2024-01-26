@@ -23,48 +23,48 @@
 --		long as its copyright notice remains unchanged. 
 ------------------------------------------------------------------------------*/
 
-module Memoria32 (
-    input wire [31:0] raddress,
-    input wire [31:0] waddress,
-    input wire Clk,
-    input wire [31:0] Datain,
-    output wire [31:0] Dataout,
-    input wire Wr
+module Memory32 (
+    input wire [31:0] ReadAddress,
+    input wire [31:0] WriteAddress,
+    input wire clk,
+    input wire [31:0] DataIn,
+    output wire [31:0] DataOut,
+    input wire WR
 );
 
-  wire [15:0] readUsefullAddress = raddress[15:0];
+  wire [15:0] ReadUsefullAddress = ReadAddress[15:0];
 
-  wire [15:0] addS0 = readUsefullAddress + 0;
-  wire [15:0] addS1 = readUsefullAddress + 1;
-  wire [15:0] addS2 = readUsefullAddress + 2;
-  wire [15:0] addS3 = readUsefullAddress + 3;
+  wire [15:0] AddS0 = ReadUsefullAddress + 0;
+  wire [15:0] AddS1 = ReadUsefullAddress + 1;
+  wire [15:0] AddS2 = ReadUsefullAddress + 2;
+  wire [15:0] AddS3 = ReadUsefullAddress + 3;
 
-  wire [15:0] writeUsefullAddress = waddress[15:0];
+  wire [15:0] WriteUsefullAddress = WriteAddress[15:0];
 
-  wire [15:0] waddS0 = writeUsefullAddress + 0;
-  wire [15:0] waddS1 = writeUsefullAddress + 1;
-  wire [15:0] waddS2 = writeUsefullAddress + 2;
-  wire [15:0] waddS3 = writeUsefullAddress + 3;
+  wire [15:0] WAddS0 = WriteUsefullAddress + 0;
+  wire [15:0] WAddS1 = WriteUsefullAddress + 1;
+  wire [15:0] WAddS2 = WriteUsefullAddress + 2;
+  wire [15:0] WAddS3 = WriteUsefullAddress + 3;
 
-  wire [7:0] inS0;
-  wire [7:0] inS1;
-  wire [7:0] inS2;
-  wire [7:0] inS3;
+  wire [7:0] InS0;
+  wire [7:0] InS1;
+  wire [7:0] InS2;
+  wire [7:0] InS3;
 
-  wire [7:0] outS0;
-  wire [7:0] outS1;
-  wire [7:0] outS2;
-  wire [7:0] outS3;
+  wire [7:0] OutS0;
+  wire [7:0] OutS1;
+  wire [7:0] OutS2;
+  wire [7:0] OutS3;
 
-  assign Dataout[31:24] = outS3;
-  assign Dataout[23:16] = outS2;
-  assign Dataout[15:8] = outS1;
-  assign Dataout[7:0] = outS0;
+  assign DataOut[31:24] = OutS3;
+  assign DataOut[23:16] = OutS2;
+  assign DataOut[15:8] = OutS1;
+  assign DataOut[7:0] = OutS0;
 
-  assign inS3 = Datain[31:24];
-  assign inS2 = Datain[23:16];
-  assign inS1 = Datain[15:8];
-  assign inS0 = Datain[7:0];
+  assign InS3 = DataIn[31:24];
+  assign InS2 = DataIn[23:16];
+  assign InS1 = DataIn[15:8];
+  assign InS0 = DataIn[7:0];
 
   //Bancos de memórias (cada banco possui 65536 bytes)
   //0
@@ -72,48 +72,48 @@ module Memoria32 (
       .ramSize(65536),
       .ramWide(8)
   ) memBlock0 (
-      .clk(Clk),
-      .data(inS0),
-      .radd(addS0),
-      .wadd(waddS0),
-      .wren(Wr),
-      .q(outS0)
+      .clk(clk),
+      .data(InS0),
+      .radd(AddS0),
+      .wadd(WAddS0),
+      .wren(WR),
+      .q(OutS0)
   );
   //1
   ramOnChip32 #(
       .ramSize(65536),
       .ramWide(8)
   ) memBlock1 (
-      .clk(Clk),
-      .data(inS1),
-      .radd(addS1),
-      .wadd(waddS1),
-      .wren(Wr),
-      .q(outS1)
+      .clk(clk),
+      .data(InS1),
+      .radd(AddS1),
+      .wadd(WAddS1),
+      .wren(WR),
+      .q(OutS1)
   );
   //2
   ramOnChip32 #(
       .ramSize(65536),
       .ramWide(8)
   ) memBlock2 (
-      .clk(Clk),
-      .data(inS2),
-      .radd(addS2),
-      .wadd(waddS2),
-      .wren(Wr),
-      .q(outS2)
+      .clk(clk),
+      .data(InS2),
+      .radd(AddS2),
+      .wadd(WAddS2),
+      .wren(WR),
+      .q(OutS2)
   );
   //3
   ramOnChip32 #(
       .ramSize(65536),
       .ramWide(8)
   ) memBlock3 (
-      .clk(Clk),
-      .data(inS3),
-      .radd(addS3),
-      .wadd(waddS3),
-      .wren(Wr),
-      .q(outS3)
+      .clk(clk),
+      .data(InS3),
+      .radd(AddS3),
+      .wadd(WAddS3),
+      .wren(WR),
+      .q(OutS3)
   );
 
 endmodule

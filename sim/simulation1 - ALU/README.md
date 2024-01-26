@@ -2,7 +2,7 @@
 
 ## ADDI, OR, ADD, SLL, SRL, SRA, SLT, SLTU, SLTI, SLTIU, SLLI, SRLI, SRAI, XORI, ORI, ANDI, XOR
 
-We conducted a simulation using the instructions provided in the file [instruction.mif](instruction.mif) and the testbench [tb_top](/verif/tb_top.sv) to evaluate the pipeline's functionality.
+We conducted a simulation using the instructions provided in the file [instruction.mif](instruction.mif) and the testbench [TestBench](/verif/TestBench.sv) to evaluate the pipeline's functionality.
 
 The obtained result matches the expected outcome, which can be verified below.
 

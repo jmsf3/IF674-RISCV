@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module adder #(
+module Adder #(
     parameter WIDTH = 8
 ) (
     input  logic [WIDTH-1:0] a,

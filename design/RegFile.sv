@@ -9,29 +9,29 @@ module RegFile #(
     // Inputs 
     input clk,  //clock
     input rst,  //synchronous reset; if it is asserted (rst=1), all registers are reseted to 0
-    input rg_wrt_en,  //write signal
-    input  [ADDRESS_WIDTH-1:0] rg_wrt_dest, //address of the register that supposed to written into
-    input [ADDRESS_WIDTH-1:0] rg_rd_addr1,  //first address to be read from
-    input [ADDRESS_WIDTH-1:0] rg_rd_addr2,  //second address to be read from
-    input  [DATA_WIDTH-1:0] rg_wrt_data, // data that supposed to be written into the register file
+    input RegWrite,  //write signal
+    input  [ADDRESS_WIDTH-1:0] RegWriteAddress, //address of the register that supposed to written into
+    input [ADDRESS_WIDTH-1:0] RegReadAddress1,  //first address to be read from
+    input [ADDRESS_WIDTH-1:0] RegReadAddress2,  //second address to be read from
+    input  [DATA_WIDTH-1:0] RegWriteData, // data that supposed to be written into the register file
 
     // Outputs
-    output logic [DATA_WIDTH-1:0] rg_rd_data1,  //content of reg_file[rg_rd_addr1] is loaded into
-    output logic [DATA_WIDTH-1:0] rg_rd_data2   //content of reg_file[rg_rd_addr2] is loaded into
+    output logic [DATA_WIDTH-1:0] RegReadData1,  //content of reg_file[RegReadAddress1] is loaded into
+    output logic [DATA_WIDTH-1:0] RegReadData2   //content of reg_file[RegReadAddress2] is loaded into
 );
 
   integer i;
 
-  logic [DATA_WIDTH-1:0] register_file[NUM_REGS-1:0];
+  logic [DATA_WIDTH-1:0] RegisterFile[NUM_REGS-1:0];
 
   always @(negedge clk) begin
-    if (rst == 1'b1) for (i = 0; i < NUM_REGS; i = i + 1) register_file[i] <= 0;
-    else if (rst == 1'b0 && rg_wrt_en == 1'b1) begin
-      register_file[rg_wrt_dest] <= rg_wrt_data;
+    if (rst == 1'b1) for (i = 0; i < NUM_REGS; i = i + 1) RegisterFile[i] <= 0;
+    else if (rst == 1'b0 && RegWrite == 1'b1) begin
+      RegisterFile[RegWriteAddress] <= RegWriteData;
     end
   end
 
-  assign rg_rd_data1 = register_file[rg_rd_addr1];
-  assign rg_rd_data2 = register_file[rg_rd_addr2];
+  assign RegReadData1 = RegisterFile[RegReadAddress1];
+  assign RegReadData2 = RegisterFile[RegReadAddress2];
 
 endmodule

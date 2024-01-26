@@ -9,7 +9,7 @@ module Controller (
     output logic ALUSrc,
     //0: The second ALU operand comes from the second register file output (Read data 2); 
     //1: The second ALU operand is the sign-extended, lower 16 bits of the instruction.
-    output logic MemtoReg,
+    output logic MemToReg,
     //0: The value fed to the register Write data input comes from the ALU.
     //1: The value fed to the register Write data input comes from the data memory.
     output logic RegWrite, //The register on the Write register input is written with the value on the Write data input 
@@ -27,7 +27,7 @@ module Controller (
   assign BR = 7'b1100011;  //beq
 
   assign ALUSrc = (Opcode == LW || Opcode == SW);
-  assign MemtoReg = (Opcode == LW);
+  assign MemToReg = (Opcode == LW);
   assign RegWrite = (Opcode == R_TYPE || Opcode == LW);
   assign MemRead = (Opcode == LW);
   assign MemWrite = (Opcode == SW);
