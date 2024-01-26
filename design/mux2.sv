@@ -1,14 +1,17 @@
 `timescale 1ns / 1ps
 
 module Mux2 #(
-    parameter WIDTH = 32
-) (
-    input logic [WIDTH-1:0] d0,
-    d1,
-    input logic s,
-    output logic [WIDTH-1:0] y
-);
+        // Parameters
+        parameter WIDTH = 32
+        ) 
+        (
+        // Inputs 
+        input logic [WIDTH-1:0] d0, d1,
+        input logic s,
 
-  assign y = s ? d1 : d0;
+        // Outputs
+        output logic [WIDTH-1:0] y
+        );
 
+        assign y = s ? d1 : d0;
 endmodule

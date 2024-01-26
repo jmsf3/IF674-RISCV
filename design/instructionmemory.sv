@@ -2,25 +2,29 @@
 `timescale 1ns / 1ps
 
 module InstructionMemory #(
-    parameter INS_ADDRESS = 9,
-    parameter INS_W = 32
-) (
-    input logic clk,  // Clock
-    input logic [INS_ADDRESS -1:0] ReadAddress,  // Read address of the instruction memory, comes from PC
-    output logic [INS_W -1:0] ReadData  // Read Data
-);
+        // Parameters
+        parameter INS_ADDRESS = 9,
+        parameter INS_W = 32
+        ) 
+        (
+        // Inputs
+        input logic clk,                             // Clock
+        input logic [INS_ADDRESS -1:0] ReadAddress,  // Read address of the instruction memory, comes from PC
 
-  logic [INS_W-1 : 0] GetDataOut;  // Data output from the memory
+        // Outputs
+        output logic [INS_W -1:0] ReadData           // Read Data
+        );
 
-  Memory32 MemInstr (
-      .ReadAddress(32'(ReadAddress)),
-      .WriteAddress(32'b0),  // unused
-      .clk(~clk),
-      .DataIn(32'b0),  // unused
-      .DataOut(GetDataOut),
-      .WR(1'b0)  // unused
-  );
+        logic [INS_W-1 : 0] GetDataOut;              // Data output from the memory
 
-  assign ReadData = GetDataOut;
+        Memory32 MemInstr (
+                .ReadAddress(32'(ReadAddress)),
+                .WriteAddress(32'b0),               // Unused
+                .clk(~clk),
+                .DataIn(32'b0),                     // Unused
+                .DataOut(GetDataOut),
+                .WR(1'b0)                           // Unused
+        );
 
+        assign ReadData = GetDataOut;
 endmodule
