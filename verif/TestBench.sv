@@ -44,14 +44,14 @@ module TestBench;
         
         always @(posedge clk) begin : REGISTER
                 if (RegWriteSignal)
-                        $display($time, ": Register [%d] written with value: [%X] | [%d]\n", RegNum, RegData, $signed(RegData));
+                        $display($time, ": Register [ %d] written with value: [%X] | [%d]\n", RegNum, RegData, $signed(RegData));
         end : REGISTER
 
         always @(posedge clk) begin : MEMORY
                 if (WR && ~RD)
-                        $display($time, ": Memory [%d] written with value: [%X] | [%d]\n", Address, WRData, $signed(WRData));
+                        $display($time, ": Memory   [%d] written with value: [%X] | [%d]\n", Address, WRData, $signed(WRData));
                 else if (RD && ~WR)
-                        $display($time, ": Memory [%d] read with value: [%X] | [%d]\n", Address, RDData, $signed(RDData));
+                        $display($time, ": Memory   [%d] read with value:    [%X] | [%d]\n", Address, RDData, $signed(RDData));
         end : MEMORY
 
         // Clock generator

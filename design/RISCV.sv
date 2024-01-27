@@ -23,7 +23,7 @@ module RISCV #(
 
         logic [6:0] Opcode;
         logic ALUSrc, MemToReg, RegWrite, MemRead, MemWrite, Branch;
-        logic [1:0] ALUop;
+        logic [1:0] ALUOp;
         logic [1:0] ALUOpReg;
         logic [6:0] Funct7;
         logic [2:0] Funct3;
@@ -36,7 +36,7 @@ module RISCV #(
                 RegWrite,
                 MemRead,
                 MemWrite,
-                ALUop,
+                ALUOp,
                 Branch
         );
 
@@ -56,7 +56,7 @@ module RISCV #(
                 MemWrite,
                 MemRead,
                 Branch,
-                ALUop,
+                ALUOp,
                 Operation,
                 Opcode,
                 Funct7,

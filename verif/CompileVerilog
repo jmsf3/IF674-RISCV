@@ -1,22 +1,22 @@
-    design/Adder.sv
-    design/ramOnChip32.v
-    design/ramOnChipData.v
-    design/Memory32.sv
-    design/Memory32Data.sv
     design/RegPack.sv
-    design/RegFile.sv
+    design/Adder.sv
     design/ALU.sv
     design/ALUController.sv
     design/BranchUnit.sv
     design/Controller.sv
+    design/DataMemory.sv
+    design/DataPath.sv
     design/FlopR.sv
     design/ForwardingUnit.sv
     design/HazardDetection.sv
     design/ImmGen.sv
+    design/InstructionMemory.sv
+    design/Memory32.sv
+    design/Memory32Data.sv
     design/Mux2.sv
     design/Mux4.sv
-    design/DataMemory.sv
-    design/InstructionMemory.sv
-    design/DataPath.sv
+    design/ramOnChip32.v
+    design/ramOnChipData.v
+    design/RegFile.sv
     design/RISCV.sv
     verif/TestBench.sv
