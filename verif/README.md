@@ -16,9 +16,9 @@ Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado no me
 
 ## No Repl.it
 
-1. Crie um repl do tipo Python no [Repl.it](https://repl.it/).
+1. Crie um Repl do tipo Python no [Repl.it](https://Repl.it/).
 
-2. Copie o conteúdo do arquivo [`assembler.py`](assembler.py) para o arquivo `main.py` do seu repl.
+2. Copie o conteúdo do arquivo [`assembler.py`](assembler.py) para o arquivo `main.py` do seu Repl.
 
 3. Crie um arquivo chamado `instructions.txt` no mesmo diretório do script `main.py`.
 
@@ -27,7 +27,7 @@ Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado no me
 
 5. Execute o programa.
 
-Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado e poderá ser baixado no menu lateral do repl.
+Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado e poderá ser baixado no menu lateral do Repl.
 
 # 🧪 Como Testar seu Programa com o Testbench
 

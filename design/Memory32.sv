@@ -81,7 +81,7 @@ module Memory32 (
                         .q(OutS0)
                 );
 
-        //1
+        // 1
         ramOnChip32 #(
                 .ramSize(65536),
                 .ramWide(8)

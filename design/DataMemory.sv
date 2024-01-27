@@ -7,11 +7,11 @@ module DataMemory #(
         (
         // Inputs 
         input logic clk,
-        input logic MemRead,                     // Comes from control unit
-        input logic MemWrite,                    // Comes from control unit
+        input logic MemRead,                     // Comes from the control unit
+        input logic MemWrite,                    // Comes from the control unit
         input logic [DM_ADDRESS - 1:0] Address,  // Read / Write address - 9 LSB bits of the ALU output
         input logic [DATA_W - 1:0] WD,           // Write Data
-        input logic [2:0] Funct3,                // Bits 12 to 14 of the instruction
+        input logic [2:0] Funct3,                // Bits 12 through 14 of the instruction
 
         // Outputs
         output logic [DATA_W - 1:0] RD           // Read Data
@@ -48,11 +48,11 @@ module DataMemory #(
                 end else if (MemWrite) begin
                         case (Funct3)
                         3'b010: begin  //SW
-                              WR <= 4'b1111;
-                              DataIn <= WD;
+                                WR <= 4'b1111;
+                                DataIn <= WD;
                         end default: begin
-                              WR <= 4'b1111;
-                              DataIn <= WD;
+                                WR <= 4'b1111;
+                                DataIn <= WD;
                         end
                         endcase
                 end

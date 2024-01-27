@@ -6,16 +6,16 @@ module Controller (
 
         //Outputs
         output logic ALUSrc,       // 0: The second ALU operand comes from the second register file output (Read data 2); 
-                                   // 1: The second ALU operand is the sign-extended, lower 16 bits of the instruction.
+                                   // 1: The second ALU operand is the sign-extended lower 16 bits of the instruction.
         
-        output logic MemToReg,     // 0: The value fed to the register Write data input comes from the ALUç
+        output logic MemToReg,     // 0: The value fed to the register Write data input comes from the ALU;
                                    // 1: The value fed to the register Write data input comes from the data memory.
         
         output logic RegWrite,     // The register on the Write register input is written with the value on the Write data input 
         output logic MemRead,      // Data memory contents designated by the address input are put on the Read data output
         output logic MemWrite,     // Data memory contents designated by the address input are replaced by the value on the Write data input.
         output logic [1:0] ALUOp,  // 00: LW/SW; 01:Branch; 10: Rtype
-        output logic Branch        //0: branch is not taken; 1: branch is taken
+        output logic Branch        // 0: branch is not taken; 1: branch is taken
         );
 
         logic [6:0] R_TYPE, LW, SW, BR;
