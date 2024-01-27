@@ -34,7 +34,7 @@ module ALU #(
                         ALUResult = SrcA >>> SrcB;
                 4'b0111:        // SLL, SLLI
                         ALUResult = SrcA << SrcB;
-                4'b1000:        // SLA, SLAI
+                4'b1000:        // SLA, SLAI (Unused)
                         ALUResult = SrcA <<< SrcB;
                 4'b1001:        // BEQ
                         ALUResult = (SrcA == SrcB) ? 1 : 0;
