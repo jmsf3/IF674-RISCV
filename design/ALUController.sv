@@ -1,54 +1,56 @@
 `timescale 1ns / 1ps
 
-// -------------------------------- //
-// OP     CODE    INSTRUCTIONS      //
-// -------------------------------- //
-// &   -- 0000 -- AND, ANDI         //
-// |   -- 0001 -- OR, ORI           //
-// ^   -- 0010 -- XOR, XORI         //
-// +   -- 0011 -- LW, SW, ADD, ADDI //
-// -   -- 0100 -- SUB               //
-// >>  -- 0101 -- SRL, SRLI         //
-// >>> -- 0110 -- SRA, SRAI         //
-// <<  -- 0111 -- SLL, SLLI         //
-// <<< -- 1000 -- SLA, SLAI         // -> (Unused)
-// ==  -- 1001 -- BEQ               //
-// !=  -- 1010 -- BNE               //
-// <   -- 1011 -- SLT, SLTI, BLT    //
-// >=  -- 1100 -- BGE               //
-// --- -- 1101 -- LUI               //
-// -------------------------------- //
+// --------------------------------------------------- //
+// OP     CODE    INSTRUCTIONS         STATUS          //
+// --------------------------------------------------- //
+// &   -- 0000 -- AND, ANDI         -- OK, OK          //
+// |   -- 0001 -- OR, ORI           -- OK, OK          //
+// ^   -- 0010 -- XOR, XORI         -- OK, OK          //
+// +   -- 0011 -- LW, SW, ADD, ADDI -- OK, OK, OK, OK  //
+// -   -- 0100 -- SUB               -- OK              //
+// >>  -- 0101 -- SRL, SRLI         -- OK, OK          //
+// >>> -- 0110 -- SRA, SRAI         -- OK, OK          //
+// <<  -- 0111 -- SLL, SLLI         -- OK, OK          //
+// <<< -- 1000 -- SLA, SLAI         -- UNUSED, UNUSED  //
+// ==  -- 1001 -- BEQ               -- OK              //
+// !=  -- 1010 -- BNE               -- PENDING         //
+// <   -- 1011 -- SLT, SLTI, BLT    -- OK, OK, PENDING //
+// >=  -- 1100 -- BGE               -- PENDING         //
+// --- -- 1101 -- LUI               -- PENDING         //
+// --------------------------------------------------- //
 
 module ALUController (
-        //Inputs
+        // Inputs
         input logic [1:0] ALUOp,      // 2-bit opcode field from the Controller -- 00: LW/SW/AUIPC; 01:Branch; 10: Rtype/Itype; 11:JAL/LUI
         input logic [6:0] Funct7,     // Bits 25 to 31 of the instruction
         input logic [2:0] Funct3,     // Bits 12 to 14 of the instruction
 
-        //Outputs
+        // Outputs
         output logic [3:0] Operation  // Operation selection for ALU
         );
 
         assign Operation[0] = (ALUOp == 2'b00) ||                                                    // LW, SW
-                ((ALUOp == 2'b10) && (Funct3 == 3'b110) && (Funct7 == 7'b0000000)) ||                // OR
-                ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 == 7'b0000000)) ||                // ADD
-                ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0000000)) ||                // SRL
-                ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000)) ||                // SLL
-                ((ALUOp == 2'b01) && (Funct3 == 3'b000)) ||                                          // BEQ
-                ((ALUOp == 2'b10) && (Funct3 == 3'b010) && (Funct7 == 7'b0000000));                  // SLT
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b110)) ||                            // OR, ORI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 == 7'b0000000)) ||  // ADD
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 != 7'b0100000)) ||  // ADDI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0000000)) ||  // SRL, SRLI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000)) ||  // SLL, SLLI
+                              ((ALUOp == 2'b01) && (Funct3 == 3'b000)) ||                            // BEQ
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b010));                              // SLT, SLTI
 
         assign Operation[1] = (ALUOp == 2'b00) ||                                                    // LW, SW
-                ((ALUOp == 2'b10) && (Funct3 == 3'b100) && (Funct7 == 7'b0000000)) ||                // XOR
-                ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 == 7'b0000000)) ||                // ADD
-                ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0100000)) ||                // SRA
-                ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000)) ||                // SLL
-                ((ALUOp == 2'b10) && (Funct3 == 3'b010) && (Funct7 == 7'b0000000));                  // SLT
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b100)) ||                            // XOR, XORI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 == 7'b0000000)) ||  // ADD
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 != 7'b0100000)) ||  // ADDI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0100000)) ||  // SRA, SRAI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000)) ||  // SLL, SLLI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b010) && (Funct7 == 7'b0000000));    // SLT, SLTI
 
-        assign Operation[2] = ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 == 7'b0100000)) ||  // SUB;
-                ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0000000)) ||                // SRL
-                ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0100000)) ||                // SRA
-                ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000));                  // SLL
+        assign Operation[2] = ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 == 7'b0100000)) ||  // SUB
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0000000)) ||  // SRL, SRLI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0100000)) ||  // SRA, SRAI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000));    // SLL, SLLI
 
         assign Operation[3] = ((ALUOp == 2'b01) && (Funct3 == 3'b000)) ||                            // BEQ
-                ((ALUOp == 2'b10) && (Funct3 == 3'b010) && (Funct7 == 7'b0000000));                  // SLT
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b010));                              // SLT, SLTI
 endmodule

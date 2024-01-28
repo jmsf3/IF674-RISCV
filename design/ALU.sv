@@ -31,11 +31,11 @@ module ALU #(
                 4'b0101:        // SRL, SRLI
                         ALUResult = SrcA >> SrcB;
                 4'b0110:        // SRA, SRAI
-                        ALUResult = SrcA >>> SrcB;
+                        ALUResult = $signed(SrcA) >>> $signed(SrcB);
                 4'b0111:        // SLL, SLLI
                         ALUResult = SrcA << SrcB;
                 4'b1000:        // SLA, SLAI (Unused)
-                        ALUResult = SrcA <<< SrcB;
+                        ALUResult = $signed(SrcA) <<< $signed(SrcB);
                 4'b1001:        // BEQ
                         ALUResult = (SrcA == SrcB) ? 1 : 0;
                 4'b1010:        // BNE

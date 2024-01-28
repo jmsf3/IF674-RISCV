@@ -6,11 +6,11 @@ module Adder #(
         ) 
         (
         // Inputs
-        input  logic [WIDTH-1:0] a, b,
+        input  logic [WIDTH-1:0] A, B,
 
         // Outputs
-        output logic [WIDTH-1:0] y
+        output logic [WIDTH-1:0] C
         );
 
-        assign y = a + b;
+        assign C = A + B;
 endmodule

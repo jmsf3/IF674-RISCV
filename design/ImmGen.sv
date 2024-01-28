@@ -11,6 +11,15 @@ module ImmGen (
 
         always_comb
                 case (InstrCode[6:0])
+                7'b0010011:  /*I-type arithmetic part*/
+                        case(InstrCode[14:12])
+                        3'b001:   // SLLI
+                                ImmOut = InstrCode[24:20];
+                        3'b101:   // SRLI, SRAI
+                                ImmOut = InstrCode[24:20];
+                        default:  // ANDI, ORI, XORI, ADDI, SLTI
+                                ImmOut = {InstrCode[31] ? 20'hFFFFF : 20'b0, InstrCode[31:20]};
+                        endcase
                 7'b0000011:  /*I-type load part*/
                         ImmOut = {InstrCode[31] ? 20'hFFFFF : 20'b0, InstrCode[31:20]};
                 7'b0100011:  /*S-type*/
