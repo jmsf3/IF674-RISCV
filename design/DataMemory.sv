@@ -44,8 +44,12 @@ module DataMemory #(
                                 RD <= DataOut;
                         3'b001:  // LH
                                 RD <= {DataOut[15] ? 16'hFFFF : 16'b0, DataOut[15:0]};
+                        3'b101:  // LHU
+                                RD <= {16'b0, DataOut[15:0]};
                         3'b000:  // LB
                                 RD <= {DataOut[7] ? 24'hFFFFFF : 24'b0, DataOut[7:0]};
+                        3'b100:  // LBU
+                                RD <= {24'b0, DataOut[7:0]};
                         default: 
                                 RD <= DataOut;
                         endcase

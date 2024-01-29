@@ -3,6 +3,5 @@ addi x2,x0,4
 or x4,x2,x0
 lb x6,0(x7)
 add x6,x4,x2
-lb x7,0(x6)
-lh x8,0(x6)
-lw x9,0(x6)
+lbu x7,0(x6)
+lhu x8,0(x6)
