@@ -33,6 +33,6 @@ module Controller (
         assign MemRead = (Opcode == LW);
         assign MemWrite = (Opcode == SW);
         assign ALUOp[0] = (Opcode == BR || Opcode == LUI);
-        assign ALUOp[1] = (Opcode == R_TYPE || I_TYPE || Opcode == LUI);
+        assign ALUOp[1] = (Opcode == R_TYPE || Opcode == I_TYPE || Opcode == LUI);
         assign Branch = (Opcode == BR);
 endmodule
