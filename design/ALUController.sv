@@ -1,23 +1,25 @@
 `timescale 1ns / 1ps
 
-// --------------------------------------------------- //
-// OP     CODE    INSTRUCTIONS         STATUS          //
-// --------------------------------------------------- //
-// &   -- 0000 -- AND, ANDI         -- OK, OK          //
-// |   -- 0001 -- OR, ORI           -- OK, OK          //
-// ^   -- 0010 -- XOR, XORI         -- OK, OK          //
-// +   -- 0011 -- LW, SW, ADD, ADDI -- OK, OK, OK, OK  //
-// -   -- 0100 -- SUB               -- OK              //
-// >>  -- 0101 -- SRL, SRLI         -- OK, OK          //
-// >>> -- 0110 -- SRA, SRAI         -- OK, OK          //
-// <<  -- 0111 -- SLL, SLLI         -- OK, OK          //
-// <<< -- 1000 -- SLA, SLAI         -- UNUSED, UNUSED  //
-// ==  -- 1001 -- BEQ               -- OK              //
-// !=  -- 1010 -- BNE               -- PENDING         //
-// <   -- 1011 -- SLT, SLTI, BLT    -- OK, OK, PENDING //
-// >=  -- 1100 -- BGE               -- PENDING         //
-// --- -- 1101 -- LUI               -- PENDING         //
-// --------------------------------------------------- //
+//--------------------------------------------------- //
+// OP  | CODE | INSTRUCTIONS   | STATUS               //
+// ----|------|----------------|--------------------- //
+// &   | 0000 | AND, ANDI      | OK, OK               //
+// |   | 0001 | OR, ORI        | OK, OK               //
+// ^   | 0010 | XOR, XORI      | OK, OK               //
+// +   | 0011 | LW, LH, LB     | OK, PENDING, PENDING //
+//     |      | SW, SH, SB     | OK, PENDING, PENDING //
+//     |      | ADD, ADDI      | OK, OK               //
+// -   | 0100 | SUB            | OK                   //
+// >>  | 0101 | SRL, SRLI      | OK, OK               //
+// >>> | 0110 | SRA, SRAI      | OK, OK               //
+// <<  | 0111 | SLL, SLLI      | OK, OK               //
+// <<< | 1000 | SLA, SLAI      | UNUSED, UNUSED       //
+// ==  | 1001 | BEQ            | OK                   //
+// !=  | 1010 | BNE            | PENDING              //
+// <   | 1011 | SLT, SLTI, BLT | OK, OK, PENDING      //
+// >=  | 1100 | BGE            | PENDING              //
+// --- | 1101 | LUI            | OK                   //
+// ---------------------------------------------------//
 
 module ALUController (
         // Inputs
@@ -36,7 +38,8 @@ module ALUController (
                               ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0000000)) ||  // SRL, SRLI
                               ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000)) ||  // SLL, SLLI
                               ((ALUOp == 2'b01) && (Funct3 == 3'b000)) ||                            // BEQ
-                              ((ALUOp == 2'b10) && (Funct3 == 3'b010));                              // SLT, SLTI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b010)) ||                            // SLT, SLTI
+                              (ALUOp == 2'b11);                                                      // LUI
 
         assign Operation[1] = (ALUOp == 2'b00) ||                                                    // LW, SW
                               ((ALUOp == 2'b10) && (Funct3 == 3'b100)) ||                            // XOR, XORI
@@ -49,8 +52,11 @@ module ALUController (
         assign Operation[2] = ((ALUOp == 2'b10) && (Funct3 == 3'b000) && (Funct7 == 7'b0100000)) ||  // SUB
                               ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0000000)) ||  // SRL, SRLI
                               ((ALUOp == 2'b10) && (Funct3 == 3'b101) && (Funct7 == 7'b0100000)) ||  // SRA, SRAI
-                              ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000));    // SLL, SLLI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b001) && (Funct7 == 7'b0000000)) ||  // SLL, SLLI
+                              (ALUOp == 2'b11);                                                      // LUI
+
 
         assign Operation[3] = ((ALUOp == 2'b01) && (Funct3 == 3'b000)) ||                            // BEQ
-                              ((ALUOp == 2'b10) && (Funct3 == 3'b010));                              // SLT, SLTI
+                              ((ALUOp == 2'b10) && (Funct3 == 3'b010)) ||                            // SLT, SLTI
+                              (ALUOp == 2'b11);                                                      // LUI
 endmodule

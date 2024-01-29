@@ -33,6 +33,8 @@ module ImmGen (
                                 InstrCode[11:8],
                                 1'b0
                         };
+                7'b0110111: /*LUI*/
+                        ImmOut = {InstrCode[31:12], 12'b0};
                 default: 
                         ImmOut = {32'b0};
                 endcase
