@@ -6,7 +6,7 @@
 // &   | 0000 | AND, ANDI      | OK, OK               //
 // |   | 0001 | OR, ORI        | OK, OK               //
 // ^   | 0010 | XOR, XORI      | OK, OK               //
-// +   | 0011 | LW, LH, LB     | OK, PENDING, PENDING //
+// +   | 0011 | LW, LH, LB     | OK, OK, OK           //
 //     |      | SW, SH, SB     | OK, PENDING, PENDING //
 //     |      | ADD, ADDI      | OK, OK               //
 // -   | 0100 | SUB            | OK                   //

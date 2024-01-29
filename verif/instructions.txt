@@ -1,4 +1,4 @@
-addi x1,x0,8
-sub x6,x6,x1
-and x7,x6,x1
-lui x6,3
+lw x1,0(x0)
+sw x1,4(x0)
+sh x1,8(x0)
+sb x1,12(x0)

@@ -42,6 +42,10 @@ module DataMemory #(
                         case (Funct3)
                         3'b010:  // LW
                                 RD <= DataOut;
+                        3'b001:  // LH
+                                RD <= DataOut[15:0];
+                        3'b000:  // LB
+                                RD <= DataOut[7:0];
                         default: 
                                 RD <= DataOut;
                         endcase
