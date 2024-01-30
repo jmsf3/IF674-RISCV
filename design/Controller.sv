@@ -25,7 +25,7 @@ module Controller (
         assign LUI = 7'b0110111;     // LUI
         assign LW = 7'b0000011;      // LW
         assign SW = 7'b0100011;      // SW
-        assign BR = 7'b1100011;      // BEQ
+        assign BR = 7'b1100011;      // BEQ, BNE, BLT, BGE
 
         assign ALUSrc = (Opcode == I_TYPE || Opcode == LUI || Opcode == LW || Opcode == SW);
         assign MemToReg = (Opcode == LW);
