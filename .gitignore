@@ -1,4 +1,3 @@
-verif/*.ver
 work/
+verif/*.ver
 IF674-RISCV.cr.mti
-vsim.wlf

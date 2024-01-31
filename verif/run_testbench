@@ -1,0 +1,5 @@
+vlib work
+vlog -f verif/compile_verilog
+vsim -gui -L altera_mf_ver work.testbench
+run -all
+vdel -all -lib work

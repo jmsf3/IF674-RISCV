@@ -1,66 +1,67 @@
 `timescale 1ns / 1ps
 
 module DataMemory #(
-        parameter DM_ADDRESS = 9,
-        parameter DATA_W = 32
-        ) 
+        // Parameters
+        parameter ADDRESS_WIDTH = 9,
+        parameter DATA_WIDTH = 32
+        )
         (
-        // Inputs 
+        // Inputs
         input logic clk,
-        input logic MemRead,                     // Comes from the control unit
-        input logic MemWrite,                    // Comes from the control unit
-        input logic [DM_ADDRESS - 1:0] Address,  // Read / Write address - 9 LSB bits of the ALU output
-        input logic [DATA_W - 1:0] WD,           // Write Data
-        input logic [2:0] Funct3,                // Bits 12 through 14 of the instruction
+        input logic [ADDRESS_WIDTH-1:0] Address,  // Read / Write address - 9 LSB bits of the ALU output
+        input logic [DATA_WIDTH-1:0] WriteData,   // Write data
+        input logic MemRead,                      // Comes from the control unit
+        input logic MemWrite,                     // Comes from the control unit
+        input logic [2:0] Funct3,                 // Bits 12 through 14 of the instruction
 
         // Outputs
-        output logic [DATA_W - 1:0] RD           // Read Data
+        output logic [DATA_WIDTH-1:0] ReadData    // Read data
         );
 
         logic [31:0] ReadAddress;
         logic [31:0] WriteAddress;
         logic [31:0] DataIn;
         logic [31:0] DataOut;
-        logic [ 3:0] WR;
+        logic [ 3:0] WriteEnable;
 
         Memory32Data Mem32 (
-                .ReadAddress(ReadAddress),
-                .WriteAddress(WriteAddress),
                 .clk(~clk),
                 .DataIn(DataIn),
                 .DataOut(DataOut),
-                .WR(WR)
+                .WriteAddress(WriteAddress),
+                .ReadAddress(ReadAddress),
+                .WriteEnable(WriteEnable)
         );
 
         always_ff @(*) begin
-                ReadAddress = {{22{1'b0}}, Address};
-                WriteAddress = {{22{1'b0}}, Address[8:2], {2{1'b0}}};
-                DataIn = WD;
-                WR = 4'b0000;
+                ReadAddress = {23'b0, Address};
+                WriteAddress = {23'b0, Address[8:2], 2'b0};
+                DataIn = WriteData;
+                WriteEnable = 4'b0000;
 
                 if (MemRead) begin
                         case (Funct3)
                         3'b010:  // LW
-                                RD <= DataOut;
+                                ReadData <= DataOut;
                         3'b001:  // LH
-                                RD <= {DataOut[15] ? 16'hFFFF : 16'b0, DataOut[15:0]};
+                                ReadData <= {DataOut[15] ? 16'hFFFF : 16'b0, DataOut[15:0]};
                         3'b101:  // LHU
-                                RD <= {16'b0, DataOut[15:0]};
+                                ReadData <= {16'b0, DataOut[15:0]};
                         3'b000:  // LB
-                                RD <= {DataOut[7] ? 24'hFFFFFF : 24'b0, DataOut[7:0]};
+                                ReadData <= {DataOut[7] ? 24'hFFFFFF : 24'b0, DataOut[7:0]};
                         3'b100:  // LBU
-                                RD <= {24'b0, DataOut[7:0]};
-                        default: 
-                                RD <= DataOut;
+                                ReadData <= {24'b0, DataOut[7:0]};
+                        default:
+                                ReadData <= DataOut;
                         endcase
                 end else if (MemWrite) begin
                         case (Funct3)
-                        3'b010: begin  //SW
-                                WR <= 4'b1111;
-                                DataIn <= WD;
+                        3'b010: begin  // SW
+                                WriteEnable <= 4'b1111;
+                                DataIn <= WriteData;
                         end default: begin
-                                WR <= 4'b1111;
-                                DataIn <= WD;
+                                WriteEnable <= 4'b1111;
+                                DataIn <= WriteData;
                         end
                         endcase
                 end

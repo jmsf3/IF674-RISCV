@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
 
-module FlopR #(
+module StallFF #(
         // Parameters
         parameter WIDTH = 8
-        ) 
+        )
         (
         // Inputs
         input logic clk, rst,
@@ -15,9 +15,9 @@ module FlopR #(
         );
 
         always_ff @(posedge clk, posedge rst) begin
-                if (rst) 
+                if (rst)
                         Q <= 0;
-                else if (!Stall) 
+                else if (!Stall)
                         Q <= D;
         end
 endmodule

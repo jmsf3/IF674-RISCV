@@ -1,33 +1,34 @@
 `timescale 1ns / 1ps
 
-module TestBench;
-
+module testbench;
         // Clock and reset signals declaration
         logic clk, rst;
-        logic [31:0] TestBenchWBData;
+        logic [31:0] TestbenchWBData;
 
         logic [4:0] RegNum;
         logic [31:0] RegData;
         logic RegWriteSignal;
-        logic WR;
-        logic RD;
+
+        logic WriteEnable;
+        logic ReadEnable;
         logic [8:0] Address;
+
         logic [31:0] WRData;
         logic [31:0] RDData;
 
         localparam CLK_PERIOD = 10;
         localparam CLK_DELAY = CLK_PERIOD / 2;
-        localparam NUM_CYCLES = 50;
+        localparam NUM_CYCLES = 100;
 
         RISCV RV (
                 .clk(clk),
                 .rst(rst),
-                .WBData(TestBenchWBData),
+                .WBData(TestbenchWBData),
                 .RegNum(RegNum),
                 .RegData(RegData),
                 .RegWriteSignal(RegWriteSignal),
-                .WR(WR),
-                .RD(RD),
+                .WriteEnable(WriteEnable),
+                .ReadEnable(ReadEnable),
                 .Address(Address),
                 .WRData(WRData),
                 .RDData(RDData)
@@ -48,9 +49,9 @@ module TestBench;
         end : REGISTER
 
         always @(posedge clk) begin : MEMORY
-                if (WR && ~RD)
+                if (WriteEnable && ~ReadEnable)
                         $display($time, ": Memory   [%d] written with value: [%X] | [%d]\n", Address, WRData, $signed(WRData));
-                else if (RD && ~WR)
+                else if (ReadEnable && ~WriteEnable)
                         $display($time, ": Memory   [%d] read with value:    [%X] | [%d]\n", Address, RDData, $signed(RDData));
         end : MEMORY
 

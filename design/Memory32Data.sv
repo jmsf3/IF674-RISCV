@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
 -- Title        : Memória da CPU
--- Project      : CPU 
+-- Project      : CPU
 --------------------------------------------------------------------------------
 -- File	        : Memoria32.sv
 -- Author       : Lucas Fernando da Silva Cambuim <lfsc@cin.ufpe.br>
@@ -9,9 +9,9 @@
 -- Last update  : 20/09/2018
 -- Plataform    : DE2
 -- Simulators   : ModelSim
--- Synthesizers	: 
--- Targets      : 
--- Dependency   : 
+-- Synthesizers	:
+-- Targets      :
+-- Dependency   :
 --------------------------------------------------------------------------------
 -- Description	: Entidade responsável pela leitura e escrita em memória (dados de 32 bits).
 --------------------------------------------------------------------------------
@@ -19,17 +19,17 @@
 -- Universidade Federal de Pernambuco (UFPE).
 -- CIn - Centro de Informatica.
 -- Developed by computer science researchers.
--- This code may be used for educational and non-educational purposes as 
--- long as its copyright notice remains unchanged. 
+-- This code may be used for educational and non-educational purposes as
+-- long as its copyright notice remains unchanged.
 ------------------------------------------------------------------------------*/
 
 module Memory32Data (
-        input wire [31:0] ReadAddress,
-        input wire [31:0] WriteAddress,
         input wire clk,
         input wire [31:0] DataIn,
         output wire [31:0] DataOut,
-        input wire [3:0] WR
+        input wire [31:0] WriteAddress,
+        input wire [31:0] ReadAddress,
+        input wire [3:0] WriteEnable
         );
 
         wire [15:0] ReadUsefullAddress = ReadAddress[15:0];
@@ -77,7 +77,7 @@ module Memory32Data (
                         .data(InS0),
                         .radd(AddS0),
                         .wadd(WAddS0),
-                        .wren(WR[0]),
+                        .wren(WriteEnable[0]),
                         .q(OutS0)
                 );
 
@@ -90,7 +90,7 @@ module Memory32Data (
                         .data(InS1),
                         .radd(AddS1),
                         .wadd(WAddS1),
-                        .wren(WR[1]),
+                        .wren(WriteEnable[1]),
                         .q(OutS1)
                 );
 
@@ -103,7 +103,7 @@ module Memory32Data (
                         .data(InS2),
                         .radd(AddS2),
                         .wadd(WAddS2),
-                        .wren(WR[2]),
+                        .wren(WriteEnable[2]),
                         .q(OutS2)
                 );
 
@@ -116,7 +116,7 @@ module Memory32Data (
                         .data(InS3),
                         .radd(AddS3),
                         .wadd(WAddS3),
-                        .wren(WR[3]),
+                        .wren(WriteEnable[3]),
                         .q(OutS3)
                 );
 endmodule

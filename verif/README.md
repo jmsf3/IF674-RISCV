@@ -35,7 +35,7 @@ Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado e pod
 
 2. No terminal do ModelSim, execute o seguinte comando:
     ```shell
-    do verif/RunTestBench
+    do verif/run_testbench
     ```
 
-O processo de compilação e simulação será iniciado, e os resultados serão exibidos no terminal (transcript) do ModelSim. Além disso, uma janela de waveform será aberta, mostrando os sinais indicados em [`TestBench.sv`](TestBench.sv). Você pode usar essa janela para verificar mais detalhadamente o funcionamento do processador.
+O processo de compilação e simulação será iniciado, e os resultados serão exibidos no terminal (transcript) do ModelSim. Além disso, uma janela de waveform será aberta, mostrando os sinais indicados em [`testbench.sv`](testbench.sv). Você pode usar essa janela para verificar mais detalhadamente o funcionamento do processador.

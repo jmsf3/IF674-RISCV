@@ -3,15 +3,15 @@
 module Mux4 #(
         // Parameters
         parameter WIDTH = 32
-        ) 
+        )
         (
-        // Inputs 
-        input logic [WIDTH-1:0] d00, d01, d10, d11,
-        input logic [1:0] s,
+        // Inputs
+        input logic [WIDTH-1:0] D00, D01, D10, D11,
+        input logic [1:0] S,
 
         // Outputs
-        output logic [WIDTH-1:0] y
+        output logic [WIDTH-1:0] Y
         );
 
-        assign y = (s == 2'b11) ? d11 : (s == 2'b10) ? d10 : (s == 2'b01) ? d01 : d00;
+        assign Y = (S == 2'b11) ? D11 : (S == 2'b10) ? D10 : (S == 2'b01) ? D01 : D00;
 endmodule

@@ -2,7 +2,7 @@
 
 ## SW
 
-We conducted a simulation using the instructions provided in the file [sw.mif](sw.mif) and the testbench [TestBench](/verif/TestBench.sv) to evaluate the pipeline's functionality.
+We conducted a simulation using the instructions provided in the file [sw.mif](sw.mif) and the testbench [Testbench](/verif/testbench.sv) to evaluate the pipeline's functionality.
 
 Also, a 32-bit data memory was introduced. The data memory is initialized with the contents of the file [data.mif](data.mif).
 

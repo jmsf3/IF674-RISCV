@@ -3,7 +3,7 @@
 module Adder #(
         // Parameters
         parameter WIDTH = 8
-        ) 
+        )
         (
         // Inputs
         input  logic [WIDTH-1:0] A, B,

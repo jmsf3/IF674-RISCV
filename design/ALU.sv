@@ -7,14 +7,14 @@ module ALU #(
         )
         (
         // Inputs
-        input logic [DATA_WIDTH-1:0]    SrcA,
-        input logic [DATA_WIDTH-1:0]    SrcB,
+        input logic [DATA_WIDTH-1:0] SrcA,
+        input logic [DATA_WIDTH-1:0] SrcB,
         input logic [OPCODE_LENGTH-1:0] Operation,
 
         // Outputs
         output logic[DATA_WIDTH-1:0] ALUResult
         );
-    
+
         always_comb
         begin
                 case(Operation)

@@ -1,4 +1,4 @@
-DEPTH = 65536;                   -- The size of memory in words
+DEPTH = 65536;                -- The size of memory in words
 WIDTH = 8;                    -- The size of data in bits
 ADDRESS_RADIX = DEC;          -- The radix for address values
 DATA_RADIX = BIN;             -- The radix for data values

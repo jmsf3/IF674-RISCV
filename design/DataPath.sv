@@ -4,58 +4,63 @@ import PipelineBufferRegisters::*;
 
 module DataPath #(
         // Parameters
-        parameter PC_W = 9,        // Program Counter
-        parameter INS_W = 32,      // Instruction Width
-        parameter RF_ADDRESS = 5,  // Register File Address
-        parameter DATA_W = 32,     // Data Write
-        parameter DM_ADDRESS = 9,  // Data Memory Address
-        parameter ALU_CC_W = 4     // ALU Control Code Width
-        ) 
+        parameter PC_WIDTH = 9,
+        parameter DATA_WIDTH = 32,
+        parameter REG_ADDRESS_WIDTH = 5,        // Number of registers = 2^REG_ADDRESS_WIDTH
+        parameter MEM_ADDRESS_WIDTH = 9,
+        parameter INSTRUCTION_WIDTH = 32,
+        parameter ALU_CC_WIDTH = 4
+        )
         (
-        // Inputs 
+        // Inputs
         input  logic clk,
         input  logic rst,
-        input  logic RegWrite,
-        input  logic MemToReg,              // Register file writing enable   // Memory or ALU MUX
         input  logic ALUSrc,
-        input  logic MemWrite,              // Register file or Immediate MUX // Memory Writing Enable
-        input  logic MemRead,               // Memory Reading Enable
-        input  logic Branch,                // Branch Enable
         input  logic [1:0] ALUOp,
-        input  logic [ALU_CC_W-1:0] ALUCC,  // ALU Control Code ( input of the ALU )
+        input  logic MemRead,                   // Memory Reading Enable
+        input  logic MemWrite,                  // Register File or Immediate MUX // Memory Writing Enable
+        input  logic MemToReg,                  // Register File Writing Enable   // Memory or ALU MUX
+        input  logic RegWrite,
+        input  logic Branch,                    // Branch Enable
+        input  logic [ALU_CC_WIDTH-1:0] ALUCC,  // ALU Control Code
 
         // Outputs
         output logic [6:0] Opcode,
-        output logic [6:0] Funct7,
         output logic [2:0] Funct3,
-        output logic [1:0] ALUOpCurr,
-        output logic [DATA_W-1:0] WBData,  // Result After the last MUX
+        output logic [6:0] Funct7,
+        output logic [1:0] CurrALUOp,
+        output logic [DATA_WIDTH-1:0] WBData,  // Result After the Last MUX
 
         // Debugging
-        output logic [4:0] RegNum,  
-        output logic [DATA_W-1:0] RegData,
+        output logic [4:0] RegNum,
+        output logic [DATA_WIDTH-1:0] RegData,
         output logic RegWriteSignal,
 
-        output logic WR,
+        output logic WriteEnable,
         output logic ReadEnable,
-        output logic [DM_ADDRESS-1:0] Address,
-        output logic [DATA_W-1:0] WRData,
-        output logic [DATA_W-1:0] RDData
+        output logic [MEM_ADDRESS_WIDTH-1:0] Address,
+        output logic [DATA_WIDTH-1:0] WRData,
+        output logic [DATA_WIDTH-1:0] RDData
         );
 
-        logic [PC_W-1:0] PC, PCPlus4, NextPC;
-        logic [INS_W-1:0] Instr;
-        logic [DATA_W-1:0] Reg1, Reg2;
-        logic [DATA_W-1:0] ReadData;
-        logic [DATA_W-1:0] SrcB, ALUResult;
-        logic [DATA_W-1:0] ExtImm, BrImm, OldPCFour, BrPC;
-        logic [DATA_W-1:0] WriteMUXSrc;
-        logic PCSel;  // MUX select / Flush signal
+        logic [INSTRUCTION_WIDTH-1:0] Instruction;
+        logic [PC_WIDTH-1:0] PC, PCPlus4, NextPC;
+        logic PCSel;                                            // MUX Select / Flush Signal
+
+        logic [DATA_WIDTH-1:0] ReadRegister1, ReadRegister2;
+        logic [DATA_WIDTH-1:0] ReadData;
+
+        logic [DATA_WIDTH-1:0] ExtImm, BrImm, OldPCFour, BrPC;
+        logic [DATA_WIDTH-1:0] SrcB, ALUResult;
+        logic [DATA_WIDTH-1:0] WriteMUXSrc;
+
+        logic [DATA_WIDTH-1:0] FAMUXResult;
         logic [1:0] FAMUXSel;
+
+        logic [DATA_WIDTH-1:0] FBMUXResult;
         logic [1:0] FBMUXSel;
-        logic [DATA_W-1:0] FAMUXResult;
-        logic [DATA_W-1:0] FBMUXResult;
-        logic RegStall;  // 1: PC fetches the same instruction, register does not update
+
+        logic RegStall;                                         // 1: PC fetches the same instruction, register does not update
 
         IFID A;
         IDEX B;
@@ -71,12 +76,12 @@ module DataPath #(
 
         Mux2 #(9) PCMUX (
                 PCPlus4,
-                BrPC[PC_W-1:0],
+                BrPC[PC_WIDTH-1:0],
                 PCSel,
                 NextPC
         );
 
-        FlopR #(9) PCReg (
+        StallFF #(9) PCReg (
                 clk,
                 rst,
                 NextPC,
@@ -87,7 +92,7 @@ module DataPath #(
         InstructionMemory InstrMem (
                 clk,
                 PC,
-                Instr
+                Instruction
         );
 
         // IF/ID Register (A)
@@ -97,7 +102,7 @@ module DataPath #(
                         A.CurrInstr <= 0;
                 end else if (!RegStall) begin  // Stall
                         A.CurrPC <= PC;
-                        A.CurrInstr <= Instr;
+                        A.CurrInstr <= Instruction;
                 end
         end
 
@@ -105,7 +110,7 @@ module DataPath #(
         HazardDetection HDetection (
                 A.CurrInstr[19:15],
                 A.CurrInstr[24:20],
-                B.RD,
+                B.WriteRegister,
                 B.MemRead,
                 RegStall
         );
@@ -117,15 +122,15 @@ module DataPath #(
                 clk,
                 rst,
                 D.RegWrite,
-                D.RD,
                 A.CurrInstr[19:15],
                 A.CurrInstr[24:20],
+                D.WriteRegister,
                 WriteMUXSrc,
-                Reg1,
-                Reg2
+                ReadRegister1,
+                ReadRegister2
         );
 
-        assign RegNum = D.RD;
+        assign RegNum = D.WriteRegister;
         assign RegData = WriteMUXSrc;
         assign RegWriteSignal = D.RegWrite;
 
@@ -139,49 +144,49 @@ module DataPath #(
         always @(posedge clk) begin
                 if ((rst) || (RegStall) || (PCSel)) begin  // Initialization | Flush | NOP
                         B.ALUSrc <= 0;
-                        B.MemToReg <= 0;
-                        B.RegWrite <= 0;
+                        B.ALUOp <= 0;
                         B.MemRead <= 0;
                         B.MemWrite <= 0;
-                        B.ALUOp <= 0;
+                        B.MemToReg <= 0;
+                        B.RegWrite <= 0;
                         B.Branch <= 0;
                         B.CurrPC <= 0;
-                        B.RDOne <= 0;
-                        B.RDTwo <= 0;
-                        B.RSOne <= 0;
-                        B.RSTwo <= 0;
-                        B.RD <= 0;
-                        B.ImmG <= 0;
-                        B.Func3 <= 0;
-                        B.Func7 <= 0;
                         B.CurrInstr <= A.CurrInstr;  // Debug
+                        B.Funct3 <= 0;
+                        B.Funct7 <= 0;
+                        B.ReadData1 <= 0;
+                        B.ReadData2 <= 0;
+                        B.ReadRegister1 <= 0;
+                        B.ReadRegister2 <= 0;
+                        B.WriteRegister <= 0;
+                        B.ImmG <= 0;
                 end else begin
                         B.ALUSrc <= ALUSrc;
-                        B.MemToReg <= MemToReg;
-                        B.RegWrite <= RegWrite;
+                        B.ALUOp <= ALUOp;
                         B.MemRead <= MemRead;
                         B.MemWrite <= MemWrite;
-                        B.ALUOp <= ALUOp;
+                        B.MemToReg <= MemToReg;
+                        B.RegWrite <= RegWrite;
                         B.Branch <= Branch;
                         B.CurrPC <= A.CurrPC;
-                        B.RDOne <= Reg1;
-                        B.RDTwo <= Reg2;
-                        B.RSOne <= A.CurrInstr[19:15];
-                        B.RSTwo <= A.CurrInstr[24:20];
-                        B.RD <= A.CurrInstr[11:7];
-                        B.ImmG <= ExtImm;
-                        B.Func3 <= A.CurrInstr[14:12];
-                        B.Func7 <= A.CurrInstr[31:25];
                         B.CurrInstr <= A.CurrInstr;  // Debug
+                        B.Funct3 <= A.CurrInstr[14:12];
+                        B.Funct7 <= A.CurrInstr[31:25];
+                        B.ReadData1 <= ReadRegister1;
+                        B.ReadData2 <= ReadRegister2;
+                        B.ReadRegister1 <= A.CurrInstr[19:15];
+                        B.ReadRegister2 <= A.CurrInstr[24:20];
+                        B.WriteRegister <= A.CurrInstr[11:7];
+                        B.ImmG <= ExtImm;
                 end
         end
 
         //--// The Forwarding Unit
         ForwardingUnit ForUnit (
-                B.RSOne,
-                B.RSTwo,
-                C.RD,
-                D.RD,
+                B.ReadRegister1,
+                B.ReadRegister2,
+                C.WriteRegister,
+                D.WriteRegister,
                 C.RegWrite,
                 D.RegWrite,
                 FAMUXSel,
@@ -189,24 +194,24 @@ module DataPath #(
         );
 
         // ALU
-        assign Funct7 = B.Func7;
-        assign Funct3 = B.Func3;
-        assign ALUOpCurr = B.ALUOp;
+        assign Funct7 = B.Funct7;
+        assign Funct3 = B.Funct3;
+        assign CurrALUOp = B.ALUOp;
 
         Mux4 #(32) FAMUX (
-                B.RDOne,
+                B.ReadData1,
                 WriteMUXSrc,
                 C.ALUResult,
-                B.RDOne,
+                B.ReadData1,
                 FAMUXSel,
                 FAMUXResult
         );
 
         Mux4 #(32) FBMUX (
-                B.RDTwo,
+                B.ReadData2,
                 WriteMUXSrc,
                 C.ALUResult,
-                B.RDTwo,
+                B.ReadData2,
                 FBMUXSel,
                 FBMUXResult
         );
@@ -227,11 +232,11 @@ module DataPath #(
 
         BranchUnit #(9) BrUnit (
                 B.CurrPC,
+                ALUResult,
                 B.ImmG,
                 B.Branch,
-                ALUResult,
-                BrImm,
                 OldPCFour,
+                BrImm,
                 BrPC,
                 PCSel
         );
@@ -239,80 +244,80 @@ module DataPath #(
         // EX/MEM Register (C)
         always @(posedge clk) begin
                 if (rst) begin // Initialization
-                        C.RegWrite <= 0;
-                        C.MemToReg <= 0;
                         C.MemRead <= 0;
                         C.MemWrite <= 0;
-                        C.PCImm <= 0;
+                        C.MemToReg <= 0;
+                        C.RegWrite <= 0;
                         C.PCFour <= 0;
-                        C.ImmOut <= 0;
+                        C.PCImm <= 0;
+                        C.Funct3 <= 0;
+                        C.Funct7 <= 0;
+                        C.WriteRegister <= 0;
+                        C.ReadData2 <= 0;
                         C.ALUResult <= 0;
-                        C.RDTwo <= 0;
-                        C.RD <= 0;
-                        C.Func3 <= 0;
-                        C.Func7 <= 0;
+                        C.ImmOut <= 0;
                 end else begin
-                        C.RegWrite <= B.RegWrite;
-                        C.MemToReg <= B.MemToReg;
                         C.MemRead <= B.MemRead;
                         C.MemWrite <= B.MemWrite;
-                        C.PCImm <= BrImm;
+                        C.MemToReg <= B.MemToReg;
+                        C.RegWrite <= B.RegWrite;
                         C.PCFour <= OldPCFour;
-                        C.ImmOut <= B.ImmG;
-                        C.ALUResult <= ALUResult;
-                        C.RDTwo <= FBMUXResult;
-                        C.RD <= B.RD;
-                        C.Func3 <= B.Func3;
-                        C.Func7 <= B.Func7;
+                        C.PCImm <= BrImm;
                         C.CurrInstr <= B.CurrInstr;  // Debug
+                        C.Funct3 <= B.Funct3;
+                        C.Funct7 <= B.Funct7;
+                        C.WriteRegister <= B.WriteRegister;
+                        C.ReadData2 <= FBMUXResult;
+                        C.ALUResult <= ALUResult;
+                        C.ImmOut <= B.ImmG;
                 end
         end
 
-        // Data memory 
+        // Data memory
         DataMemory DataMem (
                 clk,
+                C.ALUResult[8:0],
+                C.ReadData2,
                 C.MemRead,
                 C.MemWrite,
-                C.ALUResult[8:0],
-                C.RDTwo,
-                C.Func3,
+                C.Funct3,
                 ReadData
         );
 
-        assign WR = C.MemWrite;
+        assign WriteEnable = C.MemWrite;
         assign ReadEnable = C.MemRead;
         assign Address = C.ALUResult[8:0];
-        assign WRData = C.RDTwo;
+        assign WRData = C.ReadData2;
         assign RDData = ReadData;
 
         // MEM/WB Register (D)
         always @(posedge clk) begin
                 if (rst) begin  // Initialization
-                        D.RegWrite <= 0;
                         D.MemToReg <= 0;
-                        D.PCImm <= 0;
+                        D.RegWrite <= 0;
                         D.PCFour <= 0;
-                        D.ImmOut <= 0;
+                        D.PCImm <= 0;
+                        D.WriteRegister <= 0;
+                        D.ReadData <= 0;
                         D.ALUResult <= 0;
-                        D.MemReadData <= 0;
-                        D.RD <= 0;
+                        D.ImmOut <= 0;
                 end else begin
-                        D.RegWrite <= C.RegWrite;
                         D.MemToReg <= C.MemToReg;
-                        D.PCImm <= C.PCImm;
-                        D.PCFour <= C.PCFour;
-                        D.ImmOut <= C.ImmOut;
-                        D.ALUResult <= C.ALUResult;
-                        D.MemReadData <= ReadData;
-                        D.RD <= C.RD;
+                        D.RegWrite <= C.RegWrite;
                         D.CurrInstr <= C.CurrInstr;  // Debug
+                        D.PCFour <= C.PCFour;
+                        D.PCImm <= C.PCImm;
+                        D.WriteRegister <= C.WriteRegister;
+                        D.ReadData <= ReadData;
+                        D.ALUResult <= C.ALUResult;
+                        D.ImmOut <= C.ImmOut;
                 end
         end
 
         //--// The LAST Block
         Mux2 #(32) ResMUX (
                 D.ALUResult,
-                D.MemReadData,
+                D.ReadData,
                 D.MemToReg,
                 WriteMUXSrc
         );

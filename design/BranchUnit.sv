@@ -2,31 +2,35 @@
 
 module BranchUnit #(
         // Parameters
-        parameter PC_W = 9
-        ) 
+        parameter PC_WIDTH = 9
+        )
         (
-        // Inputs 
-        input logic [PC_W-1:0] CurrPC,
+        // Inputs
+        input logic [PC_WIDTH-1:0] CurrPC,
+        input logic [31:0] ALUResult,
         input logic [31:0] Imm,
         input logic Branch,
-        input logic [31:0] ALUResult,
 
         // Outputs
-        output logic [31:0] PCImm,
         output logic [31:0] PCFour,
-        output logic [31:0] BrPC,
+        output logic [31:0] PCImm,
+        output logic [31:0] PCBranch,
         output logic PCSel
         );
 
-        logic BranchSel;
+        // Full PC (32-bit)
         logic [31:0] PCFull;
-
         assign PCFull = {23'b0, CurrPC};
 
-        assign PCImm = PCFull + Imm;
+        // Calculate PC + 4 and PC + Imm
         assign PCFour = PCFull + 32'b100;
-        assign BranchSel = Branch && ALUResult[0];  // 0: branch is taken; 1: branch is not taken
+        assign PCImm = PCFull + Imm;
 
-        assign BrPC = (BranchSel) ? PCImm : 32'b0;  // Branch -> PC+Imm  //  Otherwise, BrPC value is not important
-        assign PCSel = BranchSel;                   // 1: branch is taken; 0: branch is not taken (choose PC+4)
+        // Check if branch is taken
+        logic BranchSel;
+        assign BranchSel = Branch && ALUResult[0];      // 0: branch is taken; 1: branch is not taken
+
+        // Calculate PCBranch value
+        assign PCBranch = (BranchSel) ? PCImm : 32'b0;  // PCBranch = PCFull + Imm  //  Otherwise, PCBranch value is not important
+        assign PCSel = BranchSel;                       // 1: branch is taken; 0: branch is not taken, choose PC + 4
 endmodule

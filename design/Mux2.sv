@@ -3,15 +3,15 @@
 module Mux2 #(
         // Parameters
         parameter WIDTH = 32
-        ) 
+        )
         (
-        // Inputs 
-        input logic [WIDTH-1:0] d0, d1,
-        input logic s,
+        // Inputs
+        input logic [WIDTH-1:0] D0, D1,
+        input logic S,
 
         // Outputs
-        output logic [WIDTH-1:0] y
+        output logic [WIDTH-1:0] Y
         );
 
-        assign y = s ? d1 : d0;
+        assign Y = S ? D1 : D0;
 endmodule

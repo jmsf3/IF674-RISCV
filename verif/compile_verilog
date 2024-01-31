@@ -6,7 +6,7 @@
     design/Controller.sv
     design/DataMemory.sv
     design/DataPath.sv
-    design/FlopR.sv
+    design/StallFF.sv
     design/ForwardingUnit.sv
     design/HazardDetection.sv
     design/ImmGen.sv
@@ -19,4 +19,4 @@
     design/ramOnChipData.v
     design/RegFile.sv
     design/RISCV.sv
-    verif/TestBench.sv
+    verif/testbench.sv

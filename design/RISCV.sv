@@ -2,8 +2,8 @@
 
 module RISCV #(
         // Parameters
-        parameter DATA_W = 32
-        ) 
+        parameter DATA_WIDTH = 32
+        )
         (
         // Inputs
         input logic clk, rst,        // Clock and reset signals
@@ -14,11 +14,11 @@ module RISCV #(
         output logic [31:0] RegData,
         output logic RegWriteSignal,
 
-        output logic WR,
-        output logic RD,
+        output logic WriteEnable,
+        output logic ReadEnable,
         output logic [8:0] Address,
-        output logic [DATA_W-1:0] WRData,
-        output logic [DATA_W-1:0] RDData
+        output logic [DATA_WIDTH-1:0] WRData,
+        output logic [DATA_WIDTH-1:0] RDData
         );
 
         logic [6:0] Opcode;
@@ -31,12 +31,12 @@ module RISCV #(
 
         Controller Ctrl (
                 Opcode,
+                ALUOp,
                 ALUSrc,
-                MemToReg,
-                RegWrite,
                 MemRead,
                 MemWrite,
-                ALUOp,
+                MemToReg,
+                RegWrite,
                 Branch
         );
 
@@ -50,24 +50,24 @@ module RISCV #(
         DataPath DP (
                 clk,
                 rst,
-                RegWrite,
-                MemToReg,
                 ALUSrc,
-                MemWrite,
-                MemRead,
-                Branch,
                 ALUOp,
+                MemRead,
+                MemWrite,
+                MemToReg,
+                RegWrite,
+                Branch,
                 Operation,
                 Opcode,
-                Funct7,
                 Funct3,
+                Funct7,
                 ALUOpReg,
                 WBData,
                 RegNum,
                 RegData,
                 RegWriteSignal,
-                WR,
-                RD,
+                WriteEnable,
+                ReadEnable,
                 Address,
                 WRData,
                 RDData
