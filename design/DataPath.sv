@@ -22,6 +22,7 @@ module DataPath #(
         input  logic MemToReg,                  // Register File Writing Enable   // Memory or ALU MUX
         input  logic RegWrite,
         input  logic Branch,                    // Branch Enable
+        input  logic [1:0] RWSel,
         input  logic [ALU_CC_WIDTH-1:0] ALUCC,  // ALU Control Code
 
         // Outputs
@@ -53,6 +54,7 @@ module DataPath #(
         logic [DATA_WIDTH-1:0] ExtImm, BrImm, OldPCFour, BrPC;
         logic [DATA_WIDTH-1:0] SrcB, ALUResult;
         logic [DATA_WIDTH-1:0] WriteMUXSrc;
+        logic [DATA_WIDTH-1:0] WriteMUXResult;
 
         logic [DATA_WIDTH-1:0] FAMUXResult;
         logic [1:0] FAMUXSel;
@@ -131,7 +133,7 @@ module DataPath #(
         );
 
         assign RegNum = D.WriteRegister;
-        assign RegData = WriteMUXSrc;
+        assign RegData = WriteMUXResult;
         assign RegWriteSignal = D.RegWrite;
 
         // Sign extend
@@ -150,6 +152,7 @@ module DataPath #(
                         B.MemToReg <= 0;
                         B.RegWrite <= 0;
                         B.Branch <= 0;
+                        B.RWSel <= 0;
                         B.CurrPC <= 0;
                         B.CurrInstr <= A.CurrInstr;  // Debug
                         B.Funct3 <= 0;
@@ -168,6 +171,7 @@ module DataPath #(
                         B.MemToReg <= MemToReg;
                         B.RegWrite <= RegWrite;
                         B.Branch <= Branch;
+                        B.RWSel <= RWSel;
                         B.CurrPC <= A.CurrPC;
                         B.CurrInstr <= A.CurrInstr;  // Debug
                         B.Funct3 <= A.CurrInstr[14:12];
@@ -248,6 +252,7 @@ module DataPath #(
                         C.MemWrite <= 0;
                         C.MemToReg <= 0;
                         C.RegWrite <= 0;
+                        C.RWSel <= 0;
                         C.PCFour <= 0;
                         C.PCImm <= 0;
                         C.Funct3 <= 0;
@@ -261,6 +266,7 @@ module DataPath #(
                         C.MemWrite <= B.MemWrite;
                         C.MemToReg <= B.MemToReg;
                         C.RegWrite <= B.RegWrite;
+                        C.RWSel <= B.RWSel;
                         C.PCFour <= OldPCFour;
                         C.PCImm <= BrImm;
                         C.CurrInstr <= B.CurrInstr;  // Debug
@@ -295,6 +301,7 @@ module DataPath #(
                 if (rst) begin  // Initialization
                         D.MemToReg <= 0;
                         D.RegWrite <= 0;
+                        D.RWSel <= 0;
                         D.PCFour <= 0;
                         D.PCImm <= 0;
                         D.WriteRegister <= 0;
@@ -304,6 +311,7 @@ module DataPath #(
                 end else begin
                         D.MemToReg <= C.MemToReg;
                         D.RegWrite <= C.RegWrite;
+                        D.RWSel <= C.RWSel;
                         D.CurrInstr <= C.CurrInstr;  // Debug
                         D.PCFour <= C.PCFour;
                         D.PCImm <= C.PCImm;
@@ -322,5 +330,14 @@ module DataPath #(
                 WriteMUXSrc
         );
 
-        assign WBData = WriteMUXSrc;
+        Mux4 #(32) WrsMUX (
+                WriteMUXSrc,
+                D.PCFour,
+                D.ImmOut,
+                D.PCImm,
+                D.RWSel,
+                WriteMUXResult
+        );
+
+        assign WBData = WriteMUXResult;
 endmodule

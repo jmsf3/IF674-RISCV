@@ -21,10 +21,16 @@ module Controller (
                                      // 1: The value fed to the memory WriteData input comes from the data memory.
 
         output logic RegWrite,       // The register on the WriteRegister input is written with the value on the WriteData input
-        output logic Branch          // 0: branch is not taken; 1: branch is taken
+        output logic Branch,         // 0: branch is not taken; 1: branch is taken
+        
+        output logic [1:0] RWSel     // Defines the value of WBData:
+                                     // - 00: WriteMUXSrc
+                                     // - 01: D.PCFour
+                                     // - 10: D.ImmOut
+                                     // - 11: PCImm
         );
 
-        logic [6:0] LOAD, STORE, R_TYPE, I_TYPE, U_TYPE, BRANCH;
+        logic [6:0] LOAD, STORE, R_TYPE, I_TYPE, U_TYPE, BRANCH, JAL, JALR;
 
         assign LOAD = 7'b0000011;    // LW, LH, LHU, LB, LBU
         assign STORE = 7'b0100011;   // SW, SH, SB
@@ -32,6 +38,8 @@ module Controller (
         assign I_TYPE = 7'b0010011;  // ANDI, ORI, XORI, ADDI, SRLI, SRLA, SLLI, SLTI
         assign U_TYPE = 7'b0110111;  // LUI
         assign BRANCH = 7'b1100011;  // BEQ, BNE, BLT, BGE
+        assign JAL = 7'b1101111;     // JAL
+        assign JALR = 7'b1100111;    // JALR
 
         assign ALUOp[0] = (Opcode == U_TYPE || Opcode == BRANCH);
         assign ALUOp[1] = (Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE);
@@ -41,6 +49,9 @@ module Controller (
         assign MemWrite = (Opcode == STORE);
 
         assign MemToReg = (Opcode == LOAD);
-        assign RegWrite = ( Opcode == LOAD || Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE);
+        assign RegWrite = (Opcode == LOAD || Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE || Opcode == JAL);
         assign Branch = (Opcode == BRANCH);
+        
+        assign RWSel[0] = (Opcode == JAL);
+        assign RWSel[1] = 0;
 endmodule

@@ -23,7 +23,7 @@ module RISCV #(
 
         logic [6:0] Opcode;
         logic ALUSrc, MemToReg, RegWrite, MemRead, MemWrite, Branch;
-        logic [1:0] ALUOp;
+        logic [1:0] ALUOp, RWSel;
         logic [1:0] ALUOpReg;
         logic [6:0] Funct7;
         logic [2:0] Funct3;
@@ -37,7 +37,8 @@ module RISCV #(
                 MemWrite,
                 MemToReg,
                 RegWrite,
-                Branch
+                Branch,
+                RWSel
         );
 
         ALUController ALUCtrl (
@@ -57,6 +58,7 @@ module RISCV #(
                 MemToReg,
                 RegWrite,
                 Branch,
+                RWSel,
                 Operation,
                 Opcode,
                 Funct3,

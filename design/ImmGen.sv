@@ -34,6 +34,14 @@ module ImmGen (
                         };
                 7'b0110111: /*LUI*/
                         ImmOut = {Instruction[31:12], 12'b0};
+                7'b1101111: /*JAL*/
+                        ImmOut = {
+                                Instruction[31] ? 12'hFFF : 12'b0,
+                                Instruction[31],
+                                Instruction[19:12],
+                                Instruction[20],
+                                Instruction[30:21]
+                        };
                 default:
                         ImmOut = {32'b0};
                 endcase
