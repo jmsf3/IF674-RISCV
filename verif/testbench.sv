@@ -18,7 +18,7 @@ module testbench;
 
         localparam CLK_PERIOD = 10;
         localparam CLK_DELAY = CLK_PERIOD / 2;
-        localparam NUM_CYCLES = 100;
+        localparam NUM_CYCLES = 60;
 
         RISCV RV (
                 .clk(clk),

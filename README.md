@@ -1,8 +1,8 @@
-# Infraestrutura de Hardware - Projeto RISC-V Pipeline 🚀
+# **Infraestrutura de Hardware - Projeto RISC-V Pipeline 🚀**
 
-Este repositório contém os arquivos do projeto da disciplina Infraestrutura de Hardware (IF674) no CIn-UFPE. O objetivo do projeto é implementar instruções em um processador RISC-V usando SystemVerilog.
+Este repositório contém os arquivos do projeto da disciplina Infraestrutura de Hardware (IF674) do CIn-UFPE. O objetivo do projeto é implementar instruções em um processador RISC-V usando SystemVerilog.
 
-## 📁 **Estrutura do Repositório**
+## **📁 Estrutura do Repositório**
 O repositório está organizado da seguinte forma:
 - [`design`](/design): Contém o código-fonte do projeto do processador RISC-V.
 - [`sim`](/sim): Contém exemplos de arquivos de simulação e seus resultados esperados.
@@ -13,7 +13,7 @@ O repositório está organizado da seguinte forma:
 |----|-----------|:------------:|:-------:|:-----------:|
 | 1  | `LUI`     |     ✅      |    ✅   |     ✅     |
 | 2  | `AUPIC`   |     ❌      |    ❌   |     ❌     |
-| 3  | `JAL`     |     ❌      |    ❌   |     ❌     |
+| 3  | `JAL`     |     ✅      |    ✅   |     ✅     |
 | 4  | `JALR`    |     ❌      |    ❌   |     ❌     |
 | 5  | `BEQ`     |     ✅      |    ✅   |     ✅     |
 | 1  | `BNE`     |     ✅      |    ✅   |     ✅     |

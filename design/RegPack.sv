@@ -24,7 +24,7 @@ package PipelineBufferRegisters;
                 logic [4:0]  ReadRegister1;
                 logic [4:0]  ReadRegister2;
                 logic [4:0]  WriteRegister;
-                logic [31:0] ImmG;
+                logic [31:0] ImmOut;
         } IDEX;
 
         // Register C

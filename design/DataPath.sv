@@ -45,13 +45,13 @@ module DataPath #(
         );
 
         logic [INSTRUCTION_WIDTH-1:0] Instruction;
-        logic [PC_WIDTH-1:0] PC, PCPlus4, NextPC;
+        logic [PC_WIDTH-1:0] PC, PCFour, NextPC;
         logic PCSel;                                            // MUX Select / Flush Signal
 
         logic [DATA_WIDTH-1:0] ReadRegister1, ReadRegister2;
         logic [DATA_WIDTH-1:0] ReadData;
 
-        logic [DATA_WIDTH-1:0] ExtImm, BrImm, OldPCFour, BrPC;
+        logic [DATA_WIDTH-1:0] ExtendedImm, BranchImm, OldPCFour, PCBranch;
         logic [DATA_WIDTH-1:0] SrcB, ALUResult;
         logic [DATA_WIDTH-1:0] WriteMUXSrc;
         logic [DATA_WIDTH-1:0] WriteMUXResult;
@@ -73,12 +73,12 @@ module DataPath #(
         Adder #(9) PCAdder (
                 PC,
                 9'b100,
-                PCPlus4
+                PCFour
         );
 
         Mux2 #(9) PCMUX (
-                PCPlus4,
-                BrPC[PC_WIDTH-1:0],
+                PCFour,
+                PCBranch[PC_WIDTH-1:0],
                 PCSel,
                 NextPC
         );
@@ -139,7 +139,7 @@ module DataPath #(
         // Sign extend
         ImmGen EImm (
                 A.CurrInstr,
-                ExtImm
+                ExtendedImm
         );
 
         // ID/EX Register (B)
@@ -162,7 +162,7 @@ module DataPath #(
                         B.ReadRegister1 <= 0;
                         B.ReadRegister2 <= 0;
                         B.WriteRegister <= 0;
-                        B.ImmG <= 0;
+                        B.ImmOut <= 0;
                 end else begin
                         B.ALUSrc <= ALUSrc;
                         B.ALUOp <= ALUOp;
@@ -181,7 +181,7 @@ module DataPath #(
                         B.ReadRegister1 <= A.CurrInstr[19:15];
                         B.ReadRegister2 <= A.CurrInstr[24:20];
                         B.WriteRegister <= A.CurrInstr[11:7];
-                        B.ImmG <= ExtImm;
+                        B.ImmOut <= ExtendedImm;
                 end
         end
 
@@ -222,7 +222,7 @@ module DataPath #(
 
         Mux2 #(32) SrcBMUX (
                 FBMUXResult,
-                B.ImmG,
+                B.ImmOut,
                 B.ALUSrc,
                 SrcB
         );
@@ -234,14 +234,16 @@ module DataPath #(
                 ALUResult
         );
 
+
         BranchUnit #(9) BrUnit (
                 B.CurrPC,
                 ALUResult,
-                B.ImmG,
+                B.ImmOut,
                 B.Branch,
+                B.RWSel,
                 OldPCFour,
-                BrImm,
-                BrPC,
+                BranchImm,
+                PCBranch,
                 PCSel
         );
 
@@ -268,14 +270,14 @@ module DataPath #(
                         C.RegWrite <= B.RegWrite;
                         C.RWSel <= B.RWSel;
                         C.PCFour <= OldPCFour;
-                        C.PCImm <= BrImm;
+                        C.PCImm <= BranchImm;
                         C.CurrInstr <= B.CurrInstr;  // Debug
                         C.Funct3 <= B.Funct3;
                         C.Funct7 <= B.Funct7;
                         C.WriteRegister <= B.WriteRegister;
                         C.ReadData2 <= FBMUXResult;
                         C.ALUResult <= ALUResult;
-                        C.ImmOut <= B.ImmG;
+                        C.ImmOut <= B.ImmOut;
                 end
         end
 

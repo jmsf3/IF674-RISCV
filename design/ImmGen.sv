@@ -36,11 +36,12 @@ module ImmGen (
                         ImmOut = {Instruction[31:12], 12'b0};
                 7'b1101111: /*JAL*/
                         ImmOut = {
-                                Instruction[31] ? 12'hFFF : 12'b0,
+                                Instruction[31] ? 11'h7FF : 11'b0,
                                 Instruction[31],
                                 Instruction[19:12],
                                 Instruction[20],
-                                Instruction[30:21]
+                                Instruction[30:21],
+                                1'b0
                         };
                 default:
                         ImmOut = {32'b0};
