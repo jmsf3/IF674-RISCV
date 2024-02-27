@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+        `timescale 1ns / 1ps
 
 module DataMemory #(
         // Parameters
@@ -54,12 +54,22 @@ module DataMemory #(
                         default:
                                 ReadData <= DataOut;
                         endcase
-                end else if (MemWrite) begin
+                end 
+                else if (MemWrite) begin
                         case (Funct3)
-                        3'b010: begin  // SW
+                        3'b010: begin   // SW
                                 WriteEnable <= 4'b1111;
-                                DataIn <= WriteData;
-                        end default: begin
+                                DataIn <= WriteData; 
+                        end
+                        3'b001: begin   // SH
+                                WriteEnable <= 4'b1100;
+                                DataIn <= {WriteData[15] ? 16'hFFFF : 16'b0, WriteData[15:0]};
+                        end
+                        3'b000: begin   // SB
+                                WriteEnable <= 4'b0100;
+                                DataIn <= {WriteData[7] ? 24'hFFFFFF : 24'b0, WriteData[7:0]};
+                        end 
+                        default: begin
                                 WriteEnable <= 4'b1111;
                                 DataIn <= WriteData;
                         end
