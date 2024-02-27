@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module Mux2 #(
+module MUX2 #(
         // Parameters
         parameter WIDTH = 32
         )

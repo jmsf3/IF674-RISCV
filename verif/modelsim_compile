@@ -2,21 +2,21 @@
     design/Adder.sv
     design/ALU.sv
     design/ALUController.sv
-    design/BranchUnit.sv
+    design/BranchController.sv
     design/Controller.sv
     design/DataMemory.sv
     design/DataPath.sv
-    design/StallFF.sv
-    design/ForwardingUnit.sv
+    design/Stall.sv
+    design/Forwarding.sv
     design/HazardDetection.sv
     design/ImmGen.sv
     design/InstructionMemory.sv
     design/Memory32.sv
     design/Memory32Data.sv
-    design/Mux2.sv
-    design/Mux4.sv
+    design/MUX2.sv
+    design/MUX4.sv
     design/ramOnChip32.v
     design/ramOnChipData.v
     design/RegFile.sv
     design/RISCV.sv
-    verif/testbench.sv
+    verif/TestBench.sv

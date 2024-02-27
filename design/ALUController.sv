@@ -20,12 +20,17 @@
 
 module ALUController (
         // Inputs
-        input logic [1:0] ALUOp,      // 2-bit opcode field from the Controller -- 00: LOAD/STORE/AUIPC; 01: BRANCH; 10: R_TYPE/I_TYPE; 11: JAL/LUI
-        input logic [6:0] Funct7,     // Bits 25 to 31 of the instruction
-        input logic [2:0] Funct3,     // Bits 12 to 14 of the instruction
+        input logic [1:0] ALUOp,      // 2-bit opcode field from the instruction:
+                                      // - 00: LOAD/STORE/AUIPC;
+                                      // - 01: BRANCH;
+                                      // - 10: R_TYPE/I_TYPE;
+                                      // - 11: U_TYPE/JAL/JALR.
+        
+        input logic [6:0] Funct7,     // Bits 25 to 31 of the instruction.
+        input logic [2:0] Funct3,     // Bits 12 to 14 of the instruction.
 
         // Outputs
-        output logic [3:0] Operation  // Selected ALU operation
+        output logic [3:0] Operation  // Selected ALU operation.
         );
 
         assign Operation[0] = (ALUOp == 2'b00) ||                                                    // LOAD, STORE

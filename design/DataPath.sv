@@ -4,94 +4,102 @@ import PipelineBufferRegisters::*;
 
 module DataPath #(
         // Parameters
-        parameter PC_WIDTH = 9,
-        parameter DATA_WIDTH = 32,
-        parameter REG_ADDRESS_WIDTH = 5,        // Number of registers = 2^REG_ADDRESS_WIDTH
-        parameter MEM_ADDRESS_WIDTH = 9,
-        parameter INSTRUCTION_WIDTH = 32,
-        parameter ALU_CC_WIDTH = 4
+        parameter PC_WIDTH = 9,                       // Width of the program counter.
+        parameter DATA_WIDTH = 32,                    // Width of the data bus.
+        parameter REG_ADDRESS_WIDTH = 5,              // Number of registers = 2^REG_ADDRESS_WIDTH.
+        parameter MEM_ADDRESS_WIDTH = 9,              // Number of memory locations = 2^MEM_ADDRESS_WIDTH.
+        parameter INSTRUCTION_WIDTH = 32,             // Width of the instruction.
+        parameter ALU_CC_WIDTH = 4                    // Width of the ALU control code.
         )
         (
         // Inputs
         input  logic clk,
         input  logic rst,
-        input  logic ALUSrc,
-        input  logic [1:0] ALUOp,
-        input  logic MemRead,                   // Memory Reading Enable
-        input  logic MemWrite,                  // Register File or Immediate MUX // Memory Writing Enable
-        input  logic MemToReg,                  // Register File Writing Enable   // Memory or ALU MUX
-        input  logic RegWrite,
-        input  logic Branch,                    // Branch Enable
-        input  logic [1:0] RWSel,
-        input  logic [ALU_CC_WIDTH-1:0] ALUCC,  // ALU Control Code
+
+        input  logic [1:0] ALUOp,                     // ALU operation selector.
+        input  logic ALUSrc,                          // ALU source selector.
+
+        input  logic MemRead,                         // Memory reading enable.
+        input  logic MemWrite,                        // Register file or immediate MUX // Memory writing enable.
+      
+        input  logic MemToReg,                        // Memory or ALU MUX selector.
+        input  logic RegWrite,                        // Register file writing enable.
+      
+        input  logic Branch,                          // Branch enable.
+        input  logic [1:0] RWSel,                     // WriteBackData MUX selector.
+      
+        input  logic [ALU_CC_WIDTH-1:0] ALUCC,        // ALU control code.
 
         // Outputs
-        output logic [6:0] Opcode,
-        output logic [2:0] Funct3,
-        output logic [6:0] Funct7,
-        output logic [1:0] CurrALUOp,
-        output logic [DATA_WIDTH-1:0] WBData,  // Result After the Last MUX
+        output logic [6:0] Opcode,                    // Opcode of the current instruction.
+        output logic [6:0] Funct7,                    // Funct7 of the current instruction.
+        output logic [2:0] Funct3,                    // Funct3 of the current instruction.
+        output logic [1:0] CurrALUOp,                 // ALUOp of the current instruction.
+        output logic [DATA_WIDTH-1:0] WriteBackData,  // Result of the last stage of the pipeline.
 
         // Debugging
-        output logic [4:0] RegNum,
-        output logic [DATA_WIDTH-1:0] RegData,
-        output logic RegWriteSignal,
+        output logic [4:0] RegNum,                    // Register number.
+        output logic [DATA_WIDTH-1:0] RegData,        // Register data.
+        output logic RegWriteSignal,                  // Register writing signal.
 
-        output logic WriteEnable,
-        output logic ReadEnable,
-        output logic [MEM_ADDRESS_WIDTH-1:0] Address,
-        output logic [DATA_WIDTH-1:0] WRData,
-        output logic [DATA_WIDTH-1:0] RDData
+        output logic WriteEnable,                     // Memory writing enable.
+        output logic ReadEnable,                      // Memory reading enable.
+        output logic [MEM_ADDRESS_WIDTH-1:0] Address, // Memory address.
+        output logic [DATA_WIDTH-1:0] WRData,         // Memory writing data.
+        output logic [DATA_WIDTH-1:0] RDData          // Memory reading data.
         );
 
-        logic [INSTRUCTION_WIDTH-1:0] Instruction;
-        logic [PC_WIDTH-1:0] PC, PCFour, NextPC;
-        logic PCSel;                                            // MUX Select / Flush Signal
+        logic [INSTRUCTION_WIDTH-1:0] Instruction;                          // Instruction register.
+        logic [PC_WIDTH-1:0] PC, PCFour, NextPC;                            // Program counter values.
+        logic PCSel;                                                        // MUX selector for the next PC / Flush signal.
 
-        logic [DATA_WIDTH-1:0] ReadRegister1, ReadRegister2;
-        logic [DATA_WIDTH-1:0] ReadData;
+        logic [DATA_WIDTH-1:0] ReadRegister1, ReadRegister2;                // Register file read data.
+        logic [DATA_WIDTH-1:0] ReadData;                                    // Data memory read data.
 
-        logic [DATA_WIDTH-1:0] ExtendedImm, BranchImm, OldPCFour, PCBranch;
-        logic [DATA_WIDTH-1:0] SrcB, ALUResult;
-        logic [DATA_WIDTH-1:0] WriteMUXSrc;
-        logic [DATA_WIDTH-1:0] WriteMUXResult;
+        logic [DATA_WIDTH-1:0] ExtendedImm, BranchImm, OldPCFour, PCBranch; // Immediate values.
+        logic [DATA_WIDTH-1:0] SrcB, ALUResult;                             // ALU inputs and outputs.
+        logic [DATA_WIDTH-1:0] WriteBackMUXSrc;                             // WriteBackData MUX input.
+        logic [DATA_WIDTH-1:0] WriteBackMUXResult;                          // WriteBackData MUX output.     
 
-        logic [DATA_WIDTH-1:0] FAMUXResult;
-        logic [1:0] FAMUXSel;
+        logic [DATA_WIDTH-1:0] FAMUXResult;                                 // Forwarding A MUX output.
+        logic [1:0] FAMUXSel;                                               // Forwarding A MUX selector.
 
-        logic [DATA_WIDTH-1:0] FBMUXResult;
-        logic [1:0] FBMUXSel;
+        logic [DATA_WIDTH-1:0] FBMUXResult;                                 // Forwarding B MUX output.
+        logic [1:0] FBMUXSel;                                               // Forwarding B MUX selector.
 
-        logic RegStall;                                         // 1: PC fetches the same instruction, register does not update
+        logic RegStall;                                                     // 1: PC fetches the same instruction, register does not update.
+        
+        IFID A;                                                             // IF/ID register.
+        IDEX B;                                                             // ID/EX register.
+        EXMEM C;                                                            // EX/MEM register.
+        MEMWB D;                                                            // MEM/WB register.
 
-        IFID A;
-        IDEX B;
-        EXMEM C;
-        MEMWB D;
-
-        // Next PC
+        // Calculate the next PC value.
         Adder #(9) PCAdder (
                 PC,
                 9'b100,
                 PCFour
         );
 
-        Mux2 #(9) PCMUX (
+        // Select the next PC value.
+        MUX2 #(9) PCMUX (
                 PCFour,
                 PCBranch[PC_WIDTH-1:0],
                 PCSel,
                 NextPC
         );
-
-        StallFF #(9) PCReg (
+        
+        // Stall the PC if the register file is not updated.
+        Stall #(9) StallUnit (
                 clk,
                 rst,
                 NextPC,
                 RegStall,
                 PC
         );
-
-        InstructionMemory InstrMem (
+        
+        // Instruction memory.
+        InstructionMemory InstructionMemoryModule (
                 clk,
                 PC,
                 Instruction
@@ -99,17 +107,17 @@ module DataPath #(
 
         // IF/ID Register (A)
         always @(posedge clk) begin
-                if ((rst) || (PCSel)) begin    // Initialization | Flush
+                if ((rst) || (PCSel)) begin    // Initialization | Flush.
                         A.CurrPC <= 0;
                         A.CurrInstr <= 0;
-                end else if (!RegStall) begin  // Stall
+                end else if (!RegStall) begin  // Stall.
                         A.CurrPC <= PC;
                         A.CurrInstr <= Instruction;
                 end
         end
 
-        //--// The Hazard Detection Unit
-        HazardDetection HDetection (
+        // Hazard detection unit.
+        HazardDetection HazardDetectionUnit (
                 A.CurrInstr[19:15],
                 A.CurrInstr[24:20],
                 B.WriteRegister,
@@ -117,7 +125,7 @@ module DataPath #(
                 RegStall
         );
 
-        // Register File
+        // Register file.
         assign Opcode = A.CurrInstr[6:0];
 
         RegFile RF (
@@ -127,16 +135,16 @@ module DataPath #(
                 A.CurrInstr[19:15],
                 A.CurrInstr[24:20],
                 D.WriteRegister,
-                WriteMUXSrc,
+                WriteBackMUXSrc,
                 ReadRegister1,
                 ReadRegister2
         );
 
         assign RegNum = D.WriteRegister;
-        assign RegData = WriteMUXResult;
+        assign RegData = WriteBackMUXResult;
         assign RegWriteSignal = D.RegWrite;
 
-        // Sign extend
+        // Sign extension.
         ImmGen EImm (
                 A.CurrInstr,
                 ExtendedImm
@@ -144,9 +152,9 @@ module DataPath #(
 
         // ID/EX Register (B)
         always @(posedge clk) begin
-                if ((rst) || (RegStall) || (PCSel)) begin  // Initialization | Flush | NOP
-                        B.ALUSrc <= 0;
+                if ((rst) || (RegStall) || (PCSel)) begin  // Initialization | Flush | NOP.
                         B.ALUOp <= 0;
+                        B.ALUSrc <= 0;
                         B.MemRead <= 0;
                         B.MemWrite <= 0;
                         B.MemToReg <= 0;
@@ -154,9 +162,9 @@ module DataPath #(
                         B.Branch <= 0;
                         B.RWSel <= 0;
                         B.CurrPC <= 0;
-                        B.CurrInstr <= A.CurrInstr;  // Debug
-                        B.Funct3 <= 0;
+                        B.CurrInstr <= A.CurrInstr;  // Debug.
                         B.Funct7 <= 0;
+                        B.Funct3 <= 0;
                         B.ReadData1 <= 0;
                         B.ReadData2 <= 0;
                         B.ReadRegister1 <= 0;
@@ -173,9 +181,9 @@ module DataPath #(
                         B.Branch <= Branch;
                         B.RWSel <= RWSel;
                         B.CurrPC <= A.CurrPC;
-                        B.CurrInstr <= A.CurrInstr;  // Debug
-                        B.Funct3 <= A.CurrInstr[14:12];
+                        B.CurrInstr <= A.CurrInstr;  // Debug.
                         B.Funct7 <= A.CurrInstr[31:25];
+                        B.Funct3 <= A.CurrInstr[14:12];
                         B.ReadData1 <= ReadRegister1;
                         B.ReadData2 <= ReadRegister2;
                         B.ReadRegister1 <= A.CurrInstr[19:15];
@@ -185,8 +193,8 @@ module DataPath #(
                 end
         end
 
-        //--// The Forwarding Unit
-        ForwardingUnit ForUnit (
+        // Forwarding unit.
+        Forwarding ForwardingUnit (
                 B.ReadRegister1,
                 B.ReadRegister2,
                 C.WriteRegister,
@@ -197,30 +205,30 @@ module DataPath #(
                 FBMUXSel
         );
 
-        // ALU
+        // ALU unit.
         assign Funct7 = B.Funct7;
         assign Funct3 = B.Funct3;
         assign CurrALUOp = B.ALUOp;
 
-        Mux4 #(32) FAMUX (
+        MUX4 #(32) FAMUX (
                 B.ReadData1,
-                WriteMUXSrc,
+                WriteBackMUXSrc,
                 C.ALUResult,
                 B.ReadData1,
                 FAMUXSel,
                 FAMUXResult
         );
 
-        Mux4 #(32) FBMUX (
+        MUX4 #(32) FBMUX (
                 B.ReadData2,
-                WriteMUXSrc,
+                WriteBackMUXSrc,
                 C.ALUResult,
                 B.ReadData2,
                 FBMUXSel,
                 FBMUXResult
         );
 
-        Mux2 #(32) SrcBMUX (
+        MUX2 #(32) SrcBMUX (
                 FBMUXResult,
                 B.ImmOut,
                 B.ALUSrc,
@@ -235,7 +243,7 @@ module DataPath #(
         );
 
 
-        BranchUnit #(9) BrUnit (
+        BranchController #(9) BranchControllerUnit (
                 B.CurrPC,
                 ALUResult,
                 B.ImmOut,
@@ -249,7 +257,7 @@ module DataPath #(
 
         // EX/MEM Register (C)
         always @(posedge clk) begin
-                if (rst) begin // Initialization
+                if (rst) begin // Initialization.
                         C.MemRead <= 0;
                         C.MemWrite <= 0;
                         C.MemToReg <= 0;
@@ -257,8 +265,8 @@ module DataPath #(
                         C.RWSel <= 0;
                         C.PCFour <= 0;
                         C.PCImm <= 0;
-                        C.Funct3 <= 0;
                         C.Funct7 <= 0;
+                        C.Funct3 <= 0;
                         C.WriteRegister <= 0;
                         C.ReadData2 <= 0;
                         C.ALUResult <= 0;
@@ -271,9 +279,9 @@ module DataPath #(
                         C.RWSel <= B.RWSel;
                         C.PCFour <= OldPCFour;
                         C.PCImm <= BranchImm;
-                        C.CurrInstr <= B.CurrInstr;  // Debug
-                        C.Funct3 <= B.Funct3;
+                        C.CurrInstr <= B.CurrInstr;  // Debug.
                         C.Funct7 <= B.Funct7;
+                        C.Funct3 <= B.Funct3;
                         C.WriteRegister <= B.WriteRegister;
                         C.ReadData2 <= FBMUXResult;
                         C.ALUResult <= ALUResult;
@@ -281,8 +289,8 @@ module DataPath #(
                 end
         end
 
-        // Data memory
-        DataMemory DataMem (
+        // Data memory.
+        DataMemory DataMemoryModule (
                 clk,
                 C.ALUResult[8:0],
                 C.ReadData2,
@@ -324,22 +332,22 @@ module DataPath #(
                 end
         end
 
-        //--// The LAST Block
-        Mux2 #(32) ResMUX (
+        // Define the WriteBackData result.
+        MUX2 #(32) ResMUX (
                 D.ALUResult,
                 D.ReadData,
                 D.MemToReg,
-                WriteMUXSrc
+                WriteBackMUXSrc
         );
 
-        Mux4 #(32) WrsMUX (
-                WriteMUXSrc,
+        MUX4 #(32) WrsMUX (
+                WriteBackMUXSrc,
                 D.PCFour,
                 D.ImmOut,
                 D.PCImm,
                 D.RWSel,
-                WriteMUXResult
+                WriteBackMUXResult
         );
 
-        assign WBData = WriteMUXResult;
+        assign WriteBackData = WriteBackMUXResult;
 endmodule

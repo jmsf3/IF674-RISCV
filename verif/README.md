@@ -14,28 +14,13 @@
 
 Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado no mesmo diretório do script.
 
-## No Repl.it
+# 🧪 Como Testar seu Programa com o TestBench
 
-1. Crie um Repl do tipo Python no [Repl.it](https://Repl.it/).
+1. Abra um terminal na pasta raiz do projeto.
 
-2. Copie o conteúdo do arquivo [`assembler.py`](assembler.py) para o arquivo `main.py` do seu Repl.
-
-3. Crie um arquivo chamado `instructions.txt` no mesmo diretório do script `main.py`.
-
-4. Escreva as instruções que deseja incluir na memória de instruções no arquivo, com cada instrução em uma linha separada.
-    - As instruções devem ser escritas em assembly RISC-V. Consulte o arquivo [`assembler.py`](assembler.py) para verificar os formatos suportados.
-
-5. Execute o programa.
-
-Se tudo estiver correto, um arquivo chamado `instruction.mif` será gerado e poderá ser baixado no menu lateral do Repl.
-
-# 🧪 Como Testar seu Programa com o Testbench
-
-1. Abra o arquivo [`IF674-RISCV.mpf`](..\IF674-RISCV.mpf) como um projeto no ModelSim.
-
-2. No terminal do ModelSim, execute o seguinte comando:
+2. Execute o seguinte comando:
     ```shell
-    do verif/run_testbench
+    python3 verif\modelsim_testbench_run.py
     ```
 
-O processo de compilação e simulação será iniciado, e os resultados serão exibidos no terminal (transcript) do ModelSim.
+O processo de compilação e simulação será iniciado, e os resultados serão exibidos no terminal.

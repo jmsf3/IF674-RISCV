@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module BranchUnit #(
+module BranchController #(
         // Parameters
         parameter PC_WIDTH = 9
         )

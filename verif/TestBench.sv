@@ -1,37 +1,36 @@
 `timescale 1ns / 1ps
 
-module testbench;
-        // Clock and reset signals declaration
+module TestBench;
         logic clk, rst;
-        logic [31:0] TestbenchWBData;
 
+        logic RegWriteSignal;
         logic [4:0] RegNum;
         logic [31:0] RegData;
-        logic RegWriteSignal;
 
         logic WriteEnable;
         logic ReadEnable;
         logic [8:0] Address;
 
-        logic [31:0] WRData;
-        logic [31:0] RDData;
+        logic [31:0] WriteData;
+        logic [31:0] ReadData;
+        logic [31:0] WriteBackData;
 
         localparam CLK_PERIOD = 10;
         localparam CLK_DELAY = CLK_PERIOD / 2;
-        localparam NUM_CYCLES = 60;
+        localparam NUM_CYCLES = 50;
 
-        RISCV RV (
+        RISCV RISCV (
                 .clk(clk),
                 .rst(rst),
-                .WBData(TestbenchWBData),
+                .RegWriteSignal(RegWriteSignal),
                 .RegNum(RegNum),
                 .RegData(RegData),
-                .RegWriteSignal(RegWriteSignal),
                 .WriteEnable(WriteEnable),
                 .ReadEnable(ReadEnable),
                 .Address(Address),
-                .WRData(WRData),
-                .RDData(RDData)
+                .WriteData(WriteData),
+                .ReadData(ReadData),
+                .WriteBackData(WriteBackData)
         );
 
         initial begin
@@ -50,9 +49,9 @@ module testbench;
 
         always @(posedge clk) begin : MEMORY
                 if (WriteEnable && ~ReadEnable)
-                        $display($time, ": Memory   [%d] written with value: [%X] | [%d]\n", Address, WRData, $signed(WRData));
+                        $display($time, ": Memory   [%d] written with value: [%X] | [%d]\n", Address, WriteData, $signed(WriteData));
                 else if (ReadEnable && ~WriteEnable)
-                        $display($time, ": Memory   [%d] read with value:    [%X] | [%d]\n", Address, RDData, $signed(RDData));
+                        $display($time, ": Memory   [%d] read with value:    [%X] | [%d]\n", Address, ReadData, $signed(ReadData));
         end : MEMORY
 
         // Clock generator

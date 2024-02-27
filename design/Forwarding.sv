@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module ForwardingUnit (
+module Forwarding (
         // Inputs
         input logic [4:0] RS1,
         input logic [4:0] RS2,

@@ -8,14 +8,14 @@ module DataMemory #(
         (
         // Inputs
         input logic clk,
-        input logic [ADDRESS_WIDTH-1:0] Address,  // Read / Write address - 9 LSB bits of the ALU output
-        input logic [DATA_WIDTH-1:0] WriteData,   // Write data
-        input logic MemRead,                      // Comes from the control unit
-        input logic MemWrite,                     // Comes from the control unit
-        input logic [2:0] Funct3,                 // Bits 12 through 14 of the instruction
+        input logic [ADDRESS_WIDTH-1:0] Address,  // Read / Write address - 9 LSB bits of the ALU output.
+        input logic [DATA_WIDTH-1:0] WriteData,   // Write data.
+        input logic MemRead,                      // Comes from the control unit.
+        input logic MemWrite,                     // Comes from the control unit.
+        input logic [2:0] Funct3,                 // Bits 12 through 14 of the instruction.
 
         // Outputs
-        output logic [DATA_WIDTH-1:0] ReadData    // Read data
+        output logic [DATA_WIDTH-1:0] ReadData    // Read data.
         );
 
         logic [31:0] ReadAddress;
@@ -24,7 +24,7 @@ module DataMemory #(
         logic [31:0] DataOut;
         logic [ 3:0] WriteEnable;
 
-        Memory32Data Mem32 (
+        Memory32Data Memory32DataUnit (
                 .clk(~clk),
                 .DataIn(DataIn),
                 .DataOut(DataOut),

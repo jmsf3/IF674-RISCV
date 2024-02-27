@@ -2,7 +2,7 @@
 
 ## JAL, BEQ (taken)
 
-We conducted a simulation using the instructions provided in the file [beqtaken.mif](beqtaken.mif) and the testbench [Testbench](/verif/testbench.sv) to evaluate the pipeline's functionality.
+We conducted a simulation using the instructions provided in the file [beqtaken.mif](beqtaken.mif) and the testbench [TestBench](/verif/TestBench.sv) to evaluate the pipeline's functionality.
 
 The obtained result matches the expected outcome, which can be verified below.
 

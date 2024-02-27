@@ -1,0 +1,3 @@
+vsim -quiet -L altera_mf_ver work.TestBench
+run -all
+quit
