@@ -11,6 +11,7 @@ module BranchController #(
         input logic [31:0] Imm,
         input logic Branch,
         input logic [1:0] RWSel,
+        input logic Halt,
 
         // Outputs
         output logic [31:0] PCFour,
@@ -29,9 +30,9 @@ module BranchController #(
 
         // Check if branch is taken
         logic BranchSel;
-        assign BranchSel = (Branch && ALUResult[0]) || (RWSel == 2'b01);  // 1: branch is taken; 0: branch is not taken
+        assign BranchSel = (Branch && ALUResult[0]) || (RWSel == 2'b01) || Halt;  // 1: branch is taken; 0: branch is not taken
 
         // Calculate PCBranch value
-        assign PCBranch = (BranchSel) ? PCImm : 32'b0;                    // PCBranch = PCFull + Imm  //  Otherwise, PCBranch value is not important
+        assign PCBranch = (BranchSel) ? PCImm : (Halt ? PCFull : 32'b0);  // PCBranch = PCFull + Imm  //  Otherwise, PCBranch value is not important
         assign PCSel = BranchSel;                                         // 1: branch is taken; 0: branch is not taken, choose PC + 4
 endmodule

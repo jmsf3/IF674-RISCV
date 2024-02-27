@@ -253,6 +253,12 @@ INSTRUCTION = {
   "funct3": "111",
   "funct7": "0000000"
  },
+ "halt": {
+  "format": "HALT",
+  "opcode": "1110101",
+  "funct3": "",
+  "funct7": ""
+ },
 }
 
 
@@ -361,7 +367,7 @@ def check_immediate(immediate, length):
 # translates an instruction to binary (assembly to machine code)
 def translate_instruction(instruction):
 	try:
-		instr = instruction.split(" ")[0]
+		instr = instruction.split(" ")[0].rstrip()
 
 		check_instruction(instr)
 
@@ -369,7 +375,7 @@ def translate_instruction(instruction):
 		funct3 = INSTRUCTION[instr]["funct3"]
 		funct7 = INSTRUCTION[instr]["funct7"]
 
-		if (INSTRUCTION[instr]["format"] not in ["S", "B"]):
+		if (INSTRUCTION[instr]["format"] not in ["S", "B", "HALT"]):
 			rd = instruction.split(" ")[1].split(",")[0]
 
 			check_register(rd)
@@ -508,6 +514,9 @@ def translate_instruction(instruction):
 			shamt = sfill(sbin(shamt)[0:6], 5)
 
 			binary = funct7 + shamt + rs1 + funct3 + rd + opcode
+   
+		elif (INSTRUCTION[instr]["format"] == "HALT"):
+			binary = 25 * "0" + opcode
 
 	except Exception as e:
 		print(f"Error translating instruction '{instruction.rstrip()}': {e}")

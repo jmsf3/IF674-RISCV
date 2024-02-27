@@ -23,14 +23,16 @@ module Controller (
         output logic RegWrite,       // The register on the WriteRegister input is written with the value on the WriteData input.
         output logic Branch,         // 0: branch is not taken; 1: branch is taken.
         
-        output logic [1:0] RWSel     // Defines the value of WriteBackData:
+        output logic [1:0] RWSel,    // Defines the value of WriteBackData:
                                      // - 00: WriteBackMUXSrc
                                      // - 01: D.PCFour
                                      // - 10: D.ImmOut
                                      // - 11: PCImm
+        
+        output logic Halt            // 0: continue; 1: halt.
         );
 
-        logic [6:0] LOAD, STORE, R_TYPE, I_TYPE, U_TYPE, BRANCH, JAL, JALR;
+        logic [6:0] LOAD, STORE, R_TYPE, I_TYPE, U_TYPE, BRANCH, JAL, JALR, HALT;
 
         assign LOAD = 7'b0000011;    // LW, LH, LHU, LB, LBU
         assign STORE = 7'b0100011;   // SW, SH, SB
@@ -40,6 +42,7 @@ module Controller (
         assign BRANCH = 7'b1100011;  // BEQ, BNE, BLT, BGE, BLTU, BGEU
         assign JAL = 7'b1101111;     // JAL
         assign JALR = 7'b1100111;    // JALR
+        assign HALT = 7'b1110101;    // HALT
 
         assign ALUOp[0] = (Opcode == U_TYPE || Opcode == BRANCH);
         assign ALUOp[1] = (Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE);
@@ -54,4 +57,6 @@ module Controller (
         
         assign RWSel[0] = (Opcode == JAL);
         assign RWSel[1] = 0;
+
+        assign Halt = (Opcode == HALT);
 endmodule

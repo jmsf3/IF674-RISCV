@@ -27,6 +27,7 @@ module DataPath #(
       
         input  logic Branch,                          // Branch enable.
         input  logic [1:0] RWSel,                     // WriteBackData MUX selector.
+        input  logic Halt,                            // Halt signal.
       
         input  logic [ALU_CC_WIDTH-1:0] ALUCC,        // ALU control code.
 
@@ -161,6 +162,7 @@ module DataPath #(
                         B.RegWrite <= 0;
                         B.Branch <= 0;
                         B.RWSel <= 0;
+                        B.Halt <= 0;
                         B.CurrPC <= 0;
                         B.CurrInstr <= A.CurrInstr;  // Debug.
                         B.Funct7 <= 0;
@@ -180,6 +182,7 @@ module DataPath #(
                         B.RegWrite <= RegWrite;
                         B.Branch <= Branch;
                         B.RWSel <= RWSel;
+                        B.Halt <= Halt;
                         B.CurrPC <= A.CurrPC;
                         B.CurrInstr <= A.CurrInstr;  // Debug.
                         B.Funct7 <= A.CurrInstr[31:25];
@@ -242,13 +245,13 @@ module DataPath #(
                 ALUResult
         );
 
-
         BranchController #(9) BranchControllerUnit (
                 B.CurrPC,
                 ALUResult,
                 B.ImmOut,
                 B.Branch,
                 B.RWSel,
+                B.Halt,
                 OldPCFour,
                 BranchImm,
                 PCBranch,

@@ -15,6 +15,7 @@ package PipelineBufferRegisters;
                 logic        RegWrite;
                 logic        Branch;
                 logic [1:0]  RWSel;
+                logic        Halt;
                 logic [8:0]  CurrPC;
                 logic [31:0] CurrInstr;
                 logic [6:0]  Funct7;

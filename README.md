@@ -48,3 +48,4 @@ O repositório está organizado da seguinte forma:
 | 30 | `SRA`     |     ✅      |    ✅   |     ✅     |
 | 31 | `OR`      |     ✅      |    ✅   |     ✅     |
 | 32 | `AND`     |     ✅      |    ✅   |     ✅     |
+| 33 | `HALT`    |     ✅      |    ✅   |     ✅     |
