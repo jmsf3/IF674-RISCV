@@ -24,9 +24,12 @@ module DataPath #(
       
         input  logic MemToReg,                        // Memory or ALU MUX selector.
         input  logic RegWrite,                        // Register file writing enable.
-      
         input  logic Branch,                          // Branch enable.
+
+        input  logic JALSel,                          // Jump and link enable.
+        input  logic JALRSel,                         // Jump and link register enable.
         input  logic [1:0] RWSel,                     // WriteBackData MUX selector.
+
         input  logic Halt,                            // Halt signal.
       
         input  logic [ALU_CC_WIDTH-1:0] ALUCC,        // ALU control code.
@@ -58,6 +61,7 @@ module DataPath #(
         logic [DATA_WIDTH-1:0] ReadData;                                    // Data memory read data.
 
         logic [DATA_WIDTH-1:0] ExtendedImm, BranchImm, OldPCFour, PCBranch; // Immediate values.
+        logic [DATA_WIDTH-1:0] PCJALR;                                      // ALUResult + Imm.
         logic [DATA_WIDTH-1:0] SrcB, ALUResult;                             // ALU inputs and outputs.
         logic [DATA_WIDTH-1:0] WriteBackMUXSrc;                             // WriteBackData MUX input.
         logic [DATA_WIDTH-1:0] WriteBackMUXResult;                          // WriteBackData MUX output.     
@@ -161,6 +165,8 @@ module DataPath #(
                         B.MemToReg <= 0;
                         B.RegWrite <= 0;
                         B.Branch <= 0;
+                        B.JALSel <= 0;
+                        B.JALRSel <= 0;
                         B.RWSel <= 0;
                         B.Halt <= 0;
                         B.CurrPC <= 0;
@@ -181,6 +187,8 @@ module DataPath #(
                         B.MemToReg <= MemToReg;
                         B.RegWrite <= RegWrite;
                         B.Branch <= Branch;
+                        B.JALSel <= JALSel;
+                        B.JALRSel <= JALRSel;
                         B.RWSel <= RWSel;
                         B.Halt <= Halt;
                         B.CurrPC <= A.CurrPC;
@@ -250,10 +258,13 @@ module DataPath #(
                 ALUResult,
                 B.ImmOut,
                 B.Branch,
+                B.JALSel,
+                B.JALRSel,
                 B.RWSel,
                 B.Halt,
                 OldPCFour,
                 BranchImm,
+                PCJALR,
                 PCBranch,
                 PCSel
         );

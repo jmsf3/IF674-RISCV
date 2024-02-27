@@ -14,6 +14,8 @@ package PipelineBufferRegisters;
                 logic        MemToReg;
                 logic        RegWrite;
                 logic        Branch;
+                logic        JALSel;
+                logic        JALRSel;
                 logic [1:0]  RWSel;
                 logic        Halt;
                 logic [8:0]  CurrPC;

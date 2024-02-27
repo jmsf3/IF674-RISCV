@@ -42,7 +42,9 @@ module ALU #(
                         ALUResult = (SrcA < SrcB) ? 1 : 0;
                 4'b1011:        // BGE
                         ALUResult = (SrcA >= SrcB) ? 1 : 0;
-                4'b1100:        // LUI
+                4'b1100:        // JALR
+                        ALUResult = SrcA;
+                4'b1101:        // LUI
                         ALUResult = SrcB;
                 default:
                         ALUResult = 0;

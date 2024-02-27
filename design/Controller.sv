@@ -22,6 +22,9 @@ module Controller (
 
         output logic RegWrite,       // The register on the WriteRegister input is written with the value on the WriteData input.
         output logic Branch,         // 0: branch is not taken; 1: branch is taken.
+
+        output JALSel,               // 1: Indicates that the jump instruction is a JAL.
+        output JALRSel,              // 1: Indicates that the jump instruction is a JALR.
         
         output logic [1:0] RWSel,    // Defines the value of WriteBackData:
                                      // - 00: WriteBackMUXSrc
@@ -44,18 +47,21 @@ module Controller (
         assign JALR = 7'b1100111;    // JALR
         assign HALT = 7'b1110101;    // HALT
 
-        assign ALUOp[0] = (Opcode == U_TYPE || Opcode == BRANCH);
-        assign ALUOp[1] = (Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE);
+        assign ALUOp[0] = (Opcode == U_TYPE || Opcode == BRANCH || Opcode == JAL || Opcode == JALR);
+        assign ALUOp[1] = (Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE || Opcode == JAL || Opcode == JALR);
         assign ALUSrc = (Opcode == LOAD || Opcode == STORE || Opcode == I_TYPE || Opcode == U_TYPE);
 
         assign MemRead = (Opcode == LOAD);
         assign MemWrite = (Opcode == STORE);
 
         assign MemToReg = (Opcode == LOAD);
-        assign RegWrite = (Opcode == LOAD || Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE || Opcode == JAL);
+        assign RegWrite = (Opcode == LOAD || Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE || Opcode == JAL || Opcode == JALR);
         assign Branch = (Opcode == BRANCH);
+
+        assign JALSel = (Opcode == JAL);
+        assign JALRSel = (Opcode == JALR);
         
-        assign RWSel[0] = (Opcode == JAL);
+        assign RWSel[0] = (Opcode == JAL || Opcode == JALR);
         assign RWSel[1] = 0;
 
         assign Halt = (Opcode == HALT);

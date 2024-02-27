@@ -43,6 +43,11 @@ module ImmGen (
                                 Instruction[30:21],
                                 1'b0
                         };
+                7'b1100111: /*JALR*/
+                        ImmOut = {
+                                Instruction[31] ? 20'hFFFFF : 20'b0,
+                                Instruction[31:20]
+                        };
                 default:
                         ImmOut = {32'b0};
                 endcase
