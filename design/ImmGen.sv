@@ -48,6 +48,8 @@ module ImmGen (
                                 Instruction[31] ? 20'hFFFFF : 20'b0,
                                 Instruction[31:20]
                         };
+                7'b0010111: /*AUIPC*/
+                        ImmOut = {Instruction[31:12], 12'b0};
                 default:
                         ImmOut = {32'b0};
                 endcase

@@ -35,7 +35,7 @@ module Controller (
         output logic Halt            // 0: continue; 1: halt.
         );
 
-        logic [6:0] LOAD, STORE, R_TYPE, I_TYPE, U_TYPE, BRANCH, JAL, JALR, HALT;
+        logic [6:0] LOAD, STORE, R_TYPE, I_TYPE, U_TYPE, BRANCH, JAL, JALR, AUIPC, HALT;
 
         assign LOAD = 7'b0000011;    // LW, LH, LHU, LB, LBU
         assign STORE = 7'b0100011;   // SW, SH, SB
@@ -45,6 +45,7 @@ module Controller (
         assign BRANCH = 7'b1100011;  // BEQ, BNE, BLT, BGE, BLTU, BGEU
         assign JAL = 7'b1101111;     // JAL
         assign JALR = 7'b1100111;    // JALR
+        assign AUIPC = 7'b0010111;   // AUIPC
         assign HALT = 7'b1110101;    // HALT
 
         assign ALUOp[0] = (Opcode == U_TYPE || Opcode == BRANCH || Opcode == JAL || Opcode == JALR);
@@ -55,14 +56,15 @@ module Controller (
         assign MemWrite = (Opcode == STORE);
 
         assign MemToReg = (Opcode == LOAD);
-        assign RegWrite = (Opcode == LOAD || Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE || Opcode == JAL || Opcode == JALR);
+        assign RegWrite = (Opcode == LOAD || Opcode == R_TYPE || Opcode == I_TYPE || Opcode == U_TYPE || 
+                           Opcode == JAL || Opcode == JALR || Opcode == AUIPC);
         assign Branch = (Opcode == BRANCH);
 
         assign JALSel = (Opcode == JAL);
         assign JALRSel = (Opcode == JALR);
         
-        assign RWSel[0] = (Opcode == JAL || Opcode == JALR);
-        assign RWSel[1] = 0;
+        assign RWSel[0] = (Opcode == JAL || Opcode == JALR || Opcode == AUIPC);
+        assign RWSel[1] = (Opcode == AUIPC);
 
         assign Halt = (Opcode == HALT);
 endmodule

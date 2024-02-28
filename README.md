@@ -12,7 +12,7 @@ O repositório está organizado da seguinte forma:
 | #  | Instrução | Implementada | Testada | Funcionando |
 |----|-----------|:------------:|:-------:|:-----------:|
 | 1  | `LUI`     |     ✅      |    ✅   |     ✅     |
-| 2  | `AUPIC`   |     ❌      |    ❌   |     ❌     |
+| 2  | `AUPIC`   |     ✅      |    ✅   |     ✅     |
 | 3  | `JAL`     |     ✅      |    ✅   |     ✅     |
 | 4  | `JALR`    |     ✅      |    ✅   |     ✅     |
 | 5  | `BEQ`     |     ✅      |    ✅   |     ✅     |

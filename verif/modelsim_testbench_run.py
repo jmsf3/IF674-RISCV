@@ -46,6 +46,9 @@ def main():
 
     for ver_file in ver_files:
         os.remove(ver_file)
+        
+    # Delete transcript file
+    os.remove("transcript")
 
     # Delete work directory
     os.system("vdel -all -lib work")
