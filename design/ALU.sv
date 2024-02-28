@@ -46,6 +46,10 @@ module ALU #(
                         ALUResult = SrcA;
                 4'b1101:        // LUI
                         ALUResult = SrcB;
+                4'b1110:        // BLTU, SLTU, SLTIU
+                        ALUResult = ($unsigned(SrcA) < $unsigned(SrcB)) ? 1 : 0;
+                4'b1111:        // BGEU
+                        ALUResult = ($unsigned(SrcA) >= $unsigned(SrcB)) ? 1 : 0;
                 default:
                         ALUResult = 0;
                 endcase
